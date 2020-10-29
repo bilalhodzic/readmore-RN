@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import *as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import BottomNav from './src/components/bottomNav'
 
 
