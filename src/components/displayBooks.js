@@ -1,15 +1,28 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
+import { searchWithIndex } from "../../libgen-api/searchWithIndex";
 import { StyleSheet, Image, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Card, Paragraph, Caption, Divider, Button } from "react-native-paper";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import DisplayOneBook from "./displayOneBook";
 
 export default function DisplayBooks(prop) {
-  //console.log('prop is: ', prop.book)
+  //console.log("prop is: ", prop);
 
+  //if pressed on see more --load one book in another page with all details
   const loadOneBook = (bookid) => {
     console.log(bookid);
+    searchWithIndex(bookid)
+      .then((response) => {
+        prop.navigation.navigate("mainPage", { screen: "oneBook" });
+        console.log(response);
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
   };
 
   return (
@@ -18,7 +31,6 @@ export default function DisplayBooks(prop) {
         <Image style={styles.bookImage} source={{ uri: prop.book.image }} />
         <Card.Content style={styles.bookDescr}>
           <Paragraph style={{ textAlign: "center" }}>
-            {" "}
             {prop.book.title}
           </Paragraph>
           <Caption style={{ textAlign: "center" }}>

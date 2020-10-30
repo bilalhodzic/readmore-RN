@@ -1,12 +1,11 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   StyleSheet,
   Keyboard,
   TouchableWithoutFeedback,
-  View,
   SafeAreaView,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { searchBooks } from "../../libgen-api/search";
 import DisplayBooks from "./displayBooks";
@@ -36,7 +35,7 @@ const DismissKeyboard = ({ children }) => (
   </TouchableWithoutFeedback>
 );
 
-export default function MainPage() {
+export default function MainPage({ navigation }) {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
@@ -89,8 +88,8 @@ export default function MainPage() {
 
   return (
     <DismissKeyboard>
-      <View theme={theme} style={styles.container}>
-        <ScrollView ref={scrollRef}>
+      <>
+        <ScrollView ref={scrollRef} contentContainerStyle={styles.container}>
           <SafeAreaView style={{ alignItems: "center" }}>
             <Headline style={styles.heading}>
               Search millions of{"\n"} books online
@@ -117,7 +116,7 @@ export default function MainPage() {
                 fontSize: 16,
                 fontWeight: "500",
               }}
-              style={{ borderRadius: 20, margin: 10 }}
+              style={{ borderRadius: 20, margin: 10, marginBottom: 25 }}
               onPress={() => {
                 getBooks();
                 Keyboard.dismiss();
@@ -128,7 +127,7 @@ export default function MainPage() {
 
             {books &&
               books.map((book, index) => (
-                <DisplayBooks book={book} key={index} />
+                <DisplayBooks book={book} navigation={navigation} key={index} />
               ))}
           </SafeAreaView>
         </ScrollView>
@@ -152,14 +151,14 @@ export default function MainPage() {
             onPress={backToTop}
           />
         )}
-      </View>
+      </>
     </DismissKeyboard>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#fff",
     fontFamily: "arial",
     padding: "2%",

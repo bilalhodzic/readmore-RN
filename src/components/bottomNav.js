@@ -1,37 +1,60 @@
-import * as React from 'react';
-import { BottomNavigation, Text } from 'react-native-paper';
-import MainPage from './mainPage'
-import Library from './library'
+import * as React from "react";
+import MainPage from "./mainPage";
+import Library from "./library";
+import DisplayOneBook from "./displayOneBook";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
+const Tab = createMaterialBottomTabNavigator();
+const Stack = createStackNavigator();
 
-const SearchRoute = () => <MainPage/>;
-
-const LibraryRoute = () => <Library/>;
-
-
-const MyComponent = () => {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'search', title: 'Search books', icon: 'magnify' },
-    { key: 'library', title: 'My library', icon: 'book-multiple' },
-  ]);
-
-  const renderScene = BottomNavigation.SceneMap({
-    search: SearchRoute,
-    library: LibraryRoute,
-  });
-
-  return (
-    <BottomNavigation 
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-     
-      barStyle={{backgroundColor:'#0063cc'}}
-    />
-  );
+const screenOptionsStyles = {
+  headerStyle: {
+    backgroundColor: "#7b9cc6",
+    height: 80,
+  },
+  headerTitle: "Read more",
+  headerTitleAlign: "center",
+  headerTintColor: "white",
+  headerBackTitle: "Back",
 };
 
+function mainStackScreen() {
+  return (
+    <Stack.Navigator screenOptions={screenOptionsStyles}>
+      <Stack.Screen name="search" component={MainPage} />
+      <Stack.Screen name="oneBook" component={DisplayOneBook} />
+    </Stack.Navigator>
+  );
+}
 
+function libraryStackScreen() {
+  return (
+    <Stack.Navigator screenOptions={screenOptionsStyles}>
+      <Stack.Screen name="library" component={Library} />
+    </Stack.Navigator>
+  );
+}
 
-export default MyComponent;
+export default function BottomNav() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        initialRouteName="mainPage"
+        barStyle={{ backgroundColor: "#0063cc" }}
+      >
+        <Tab.Screen
+          name="mainPage"
+          options={{ title: "Search books", tabBarIcon: "magnify" }}
+          component={mainStackScreen}
+        />
+        <Tab.Screen
+          name="library"
+          options={{ title: "My library", tabBarIcon: "book-multiple" }}
+          component={libraryStackScreen}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}

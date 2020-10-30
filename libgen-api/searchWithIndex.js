@@ -33,6 +33,6 @@ export const searchWithIndex = async (id) => {
   } else {
     book.filesize = book.filesize.toFixed(2) + "Bytes";
   }
+  //returns an object
   return book;
 };
-
