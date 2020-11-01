@@ -5,9 +5,6 @@ import { StyleSheet, Image, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Card, Paragraph, Caption, Divider, Button } from "react-native-paper";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import DisplayOneBook from "./displayOneBook";
 
 export default function DisplayBooks(prop) {
   //console.log("prop is: ", prop);
@@ -17,8 +14,12 @@ export default function DisplayBooks(prop) {
     console.log(bookid);
     searchWithIndex(bookid)
       .then((response) => {
-        prop.navigation.navigate("mainPage", { screen: "oneBook" });
-        console.log(response);
+        //nested navigation with parameters
+        prop.navigation.navigate("mainPage", {
+          screen: "oneBook",
+          params: { oneBook: response },
+        });
+        console.log("oneBook is ready to display");
       })
       .catch((err) => {
         return console.log(err);
