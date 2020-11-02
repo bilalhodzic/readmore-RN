@@ -36,7 +36,7 @@ const DismissKeyboard = ({ children }) => (
 );
 
 export default function MainPage({ navigation }) {
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState("search");
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
   const [books, setBooks] = React.useState([]);
