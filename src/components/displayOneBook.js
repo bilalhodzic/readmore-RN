@@ -19,6 +19,7 @@ import {
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
 import HTML from "react-native-render-html";
+import { WebView } from "react-native-webview";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
 const bookDir = FileSystem.documentDirectory + "books/";
