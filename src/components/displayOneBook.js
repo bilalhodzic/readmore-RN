@@ -19,8 +19,8 @@ import {
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
 import HTML from "react-native-render-html";
-import { WebView } from "react-native-webview";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { insertValue, getAllValues } from "../../storage";
 
 const bookDir = FileSystem.documentDirectory + "books/";
 
@@ -40,16 +40,19 @@ export default function DisplayOneBook({ route, navigation }) {
   const downloadFile = async () => {
     console.log("pressed");
     let downloadURL = getDLink(oneBook);
-    console.log(downloadURL);
+    console.log(oneBook);
 
-    await ensureDirExists();
-    FileSystem.downloadAsync(downloadURL, bookDir + oneBook.title)
-      .then(({ uri }) => {
-        console.log("finished downloading to ", uri);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
+    //insertValue(oneBook);
+    getAllValues();
+
+    // await ensureDirExists();
+    // FileSystem.downloadAsync(downloadURL, bookDir + oneBook.title)
+    //   .then(({ uri }) => {
+    //     console.log("finished downloading to ", uri);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err.message);
+    //   });
   };
 
   //console.log(oneBook);
