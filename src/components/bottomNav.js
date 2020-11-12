@@ -32,7 +32,12 @@ function mainStackScreen() {
 function libraryStackScreen() {
   return (
     <Stack.Navigator screenOptions={screenOptionsStyles}>
-      <Stack.Screen name="library" component={Library} />
+      <Stack.Screen
+        name="myLibrary"
+        screenOptions={{ headerTitle: "Library" }}
+        component={Library}
+      />
+      <Stack.Screen name="oneBook" component={DisplayOneBook} />
     </Stack.Navigator>
   );
 }

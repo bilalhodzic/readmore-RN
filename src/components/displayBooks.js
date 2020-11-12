@@ -4,7 +4,15 @@ import { searchWithIndex } from "../../libgen-api/searchWithIndex";
 import { StyleSheet, Image, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Card, Paragraph, Caption, Divider, Button } from "react-native-paper";
+import {
+  Card,
+  Paragraph,
+  Caption,
+  Divider,
+  Button,
+  ProgressBar,
+} from "react-native-paper";
+import { insertValue, deleteValue } from "../../storage";
 
 export default function DisplayBooks(prop) {
   //console.log("prop is: ", prop);
@@ -15,15 +23,23 @@ export default function DisplayBooks(prop) {
     searchWithIndex(bookid)
       .then((response) => {
         //nested navigation with parameters
-        prop.navigation.navigate("mainPage", {
+        prop.navigation.navigate(prop.pathname, {
           screen: "oneBook",
-          params: { oneBook: response },
+          params: { oneBook: response, pathname: prop.pathname },
         });
         console.log("oneBook is ready to display");
       })
       .catch((err) => {
         return console.log(err);
       });
+  };
+  const readBook = () => {
+    console.log("read book...");
+  };
+
+  const deleteBook = (id) => {
+    console.log("book deleting", id);
+    //deleteValue(id);
   };
 
   return (
@@ -44,6 +60,42 @@ export default function DisplayBooks(prop) {
           </Caption>
         </Card.Content>
         <Divider style={{ marginTop: 10 }} />
+        {prop.pathname === "library" && (
+          <>
+            <ProgressBar
+              progress={0.3}
+              visible={prop.book.pageRead > 1}
+            ></ProgressBar>
+            <View style={styles.libContainer}>
+              {/* <MaterialCommunityIcons
+                name="delete-circle"
+                color="#ff0000"
+                size={35}
+              /> */}
+              <Button
+                color="#ff0000"
+                mode="contained"
+                dark={true}
+                uppercase={false}
+                icon="delete-circle"
+                onPress={() => deleteBook(prop.book.id)}
+              >
+                Delete book
+              </Button>
+              <Button
+                color="#7fb7f2"
+                mode="contained"
+                dark={true}
+                uppercase={false}
+                icon="book-open-page-variant"
+                onPress={readBook}
+              >
+                {" "}
+                {prop.book.pageRead > 1 ? "Continue reading" : "Start reading"}
+              </Button>
+            </View>
+          </>
+        )}
         <Button
           color="#7fb7f2"
           style={{
@@ -92,5 +144,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     alignContent: "center",
     textAlign: "center",
+  },
+  libContainer: {
+    padding: "1%",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
   },
 });

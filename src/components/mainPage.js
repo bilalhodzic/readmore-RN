@@ -127,7 +127,12 @@ export default function MainPage({ navigation }) {
 
             {books &&
               books.map((book, index) => (
-                <DisplayBooks book={book} navigation={navigation} key={index} />
+                <DisplayBooks
+                  book={book}
+                  navigation={navigation}
+                  pathname={"mainPage"}
+                  key={index}
+                />
               ))}
           </SafeAreaView>
         </ScrollView>

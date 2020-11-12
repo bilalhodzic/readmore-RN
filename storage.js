@@ -20,8 +20,7 @@ export function insertValue(book) {
         book.title,
         book.author,
         book.image,
-        book.download,
-        //book.file,
+        book.download, //book.file,
         book.pages,
         book.extension,
       ]);
@@ -39,9 +38,20 @@ export function insertValue(book) {
 export function getAllValues() {
   db.transaction((tx) => {
     let sql = "select * from books";
-    tx.executeSql(sql, (res) => {
-      console.log(res);
+    tx.executeSql(sql, [], (_, { rows: { _array } }) => {
+      console.log("iz baze: ", _array);
     });
   });
 }
-getAllValues();
+export function deleteValue(id) {
+  let sql = "delete from books where id = ?";
+  db.transaction(
+    (tx) => {
+      tx.executeSql(sql, [id]);
+    },
+    (err) => {
+      return console.log(err.message);
+    },
+    () => console.log("book deleted")
+  );
+}

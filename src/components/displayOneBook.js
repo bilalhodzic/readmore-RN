@@ -15,19 +15,23 @@ import {
   Modal,
   Portal,
   Provider,
+  Snackbar,
 } from "react-native-paper";
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 import HTML from "react-native-render-html";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { insertValue, getAllValues } from "../../storage";
+import { insertValue, getAllValues, deleteValue } from "../../storage";
+import { documentDirectory } from "expo-file-system";
 
 const bookDir = FileSystem.documentDirectory + "books/";
 
 export default function DisplayOneBook({ route, navigation }) {
   const [showDescription, setShowDescription] = React.useState(false);
   const [visibleImage, setVisibleImage] = React.useState(false);
-  const { oneBook } = route.params;
+  const [visibleSnackbar, setVisibleSnackbar] = React.useState(false);
+  const { oneBook, pathname } = route.params;
 
   async function ensureDirExists() {
     const dirInfo = await FileSystem.getInfoAsync(bookDir);
@@ -38,21 +42,32 @@ export default function DisplayOneBook({ route, navigation }) {
   }
 
   const downloadFile = async () => {
-    console.log("pressed");
+    console.log("downloading book..");
     let downloadURL = getDLink(oneBook);
-    console.log(oneBook);
+    //console.log(downloadURL);
+    setVisibleSnackbar(true);
+
+    //var asset = MediaLibrary.createAssetAsync("file://" + oneBook.image);
+
+    //MediaLibrary.createAlbumAsync("readMore", asset, false);
+
+    //console.log(oneBook);
 
     //insertValue(oneBook);
-    getAllValues();
+    //deleteValue(oneBook.id);
+    //getAllValues();
 
     // await ensureDirExists();
-    // FileSystem.downloadAsync(downloadURL, bookDir + oneBook.title)
-    //   .then(({ uri }) => {
-    //     console.log("finished downloading to ", uri);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err.message);
-    //   });
+    FileSystem.downloadAsync(downloadURL, documentDirectory + oneBook.title)
+      .then(({ uri }) => {
+        console.log("finished downloading to ", uri);
+        Permissions.askAsync(Permissions.CAMERA_ROLL);
+        let ass = MediaLibrary.createAssetAsync(uri);
+        MediaLibrary.createAlbumAsync("readMore", ass, false);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   };
 
   //console.log(oneBook);
@@ -143,14 +158,28 @@ export default function DisplayOneBook({ route, navigation }) {
                 </Card.Content>
               </Card>
             )}
-            <FAB
-              label="Download now"
-              icon="download"
-              color="white"
-              uppercase={false}
-              style={styles.fab}
-              onPress={downloadFile}
-            />
+            {pathname !== "library" && (
+              <FAB
+                label="Download now"
+                icon="download"
+                color="white"
+                uppercase={false}
+                style={styles.fab}
+                onPress={downloadFile}
+              />
+            )}
+            <Snackbar
+              visible={visibleSnackbar}
+              onDismiss={() => setVisibleSnackbar(false)}
+              duration={3000}
+              style={{
+                position: "absolute",
+                top: 50,
+                backgroundColor: "#000000CC",
+              }}
+            >
+              Downloading book..
+            </Snackbar>
 
             <StatusBar style="auto" />
           </View>
@@ -163,7 +192,7 @@ export default function DisplayOneBook({ route, navigation }) {
         style={styles.fabBack}
         animated={true}
         onPress={() => {
-          navigation.navigate("mainPage", { screen: "search" });
+          navigation.goBack();
         }}
       />
     </>

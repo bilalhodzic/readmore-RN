@@ -1,19 +1,52 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Button } from "react-native-paper";
-import { WebView } from "react-native-webview";
+import { StyleSheet, ScrollView, View } from "react-native";
+import { Button, FAB } from "react-native-paper";
+import { insertValue, getAllValues, deleteValue } from "../../storage";
+import * as SQLite from "expo-sqlite";
+import DisplayBooks from "./displayBooks";
 
 export default function Library({ navigation }) {
-  return (
-    <View style={styles.container}>
-      <Text>This is my library</Text>
-      <Button onPress={() => navigation.navigate("mainPage")}>
-        Go to main Page
-      </Button>
+  const [libraryBooks, setLibraryBooks] = React.useState([]);
 
-      <StatusBar style="auto" />
-    </View>
+  const scrollRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const db = SQLite.openDatabase("books");
+
+    db.transaction((tx) => {
+      let sql = "select * from books";
+      tx.executeSql(sql, [], (_, { rows: { _array } }) => {
+        // console.log("iz baze: ", _array);
+        setLibraryBooks(_array);
+      });
+    });
+  }, []);
+
+  return (
+    <>
+      <ScrollView ref={scrollRef}>
+        <View style={styles.container}>
+          {libraryBooks &&
+            libraryBooks.map((book, index) => (
+              <DisplayBooks
+                book={book}
+                navigation={navigation}
+                pathname={"library"}
+                key={index}
+              />
+            ))}
+        </View>
+      </ScrollView>
+      <FAB
+        style={styles.fab}
+        icon="chevron-double-up"
+        small
+        animated={true}
+        onPress={() => {
+          scrollRef.current?.scrollTo({ y: 0, animated: true });
+        }}
+      />
+    </>
   );
 }
 
@@ -22,34 +55,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
+    padding: "2%",
+    //justifyContent: "center",
   },
-  root: {
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "arial",
-    textAlign: "center",
-    paddingTop: 80,
-    marginBottom: "8%",
-  },
-  button: {
-    margin: "1%",
-    backgroundColor: "#0063cc",
-    color: "white",
-    textTransform: "none",
-    fontSize: 16,
-    fontFamily: "Arial",
-    fontWeight: "500",
-    // "&:active": {
-    //   backgroundColor: "#0069d9",
-    //   boxShadow: "none",
-    // },
-    // "&:hover": {
-    //   backgroundColor: "#0069d9",
-    //   boxShadow: "none",
-    // },
-  },
-  pagination: {
-    padding: "1%",
+  fab: {
+    backgroundColor: "#ff0000",
+    position: "absolute",
+    bottom: 30,
+    right: 30,
   },
 });
