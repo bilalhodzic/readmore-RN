@@ -20,6 +20,7 @@ import {
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
+import * as SQLite from "expo-sqlite";
 import HTML from "react-native-render-html";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { insertValue, getAllValues, deleteValue } from "../../storage";
@@ -30,7 +31,10 @@ const bookDir = FileSystem.documentDirectory + "books/";
 export default function DisplayOneBook({ route, navigation }) {
   const [showDescription, setShowDescription] = React.useState(false);
   const [visibleImage, setVisibleImage] = React.useState(false);
-  const [visibleSnackbar, setVisibleSnackbar] = React.useState(false);
+  const [downloadingSnackbar, setDownloadingSnackbar] = React.useState(false);
+  const [finishedSnackbar, setFinishedSnackbar] = React.useState(false);
+  const [errorSnackbar, setErrorSnackbar] = React.useState(false);
+
   const { oneBook, pathname } = route.params;
 
   async function ensureDirExists() {
@@ -45,7 +49,22 @@ export default function DisplayOneBook({ route, navigation }) {
     console.log("downloading book..");
     let downloadURL = getDLink(oneBook);
     //console.log(downloadURL);
-    setVisibleSnackbar(true);
+    setDownloadingSnackbar(true);
+
+    (async function () {
+      try {
+        let addBook = await insertValue(oneBook);
+        if (addBook === true) {
+          setDownloadingSnackbar(false);
+          setFinishedSnackbar(true);
+        }
+      } catch (error) {
+        setDownloadingSnackbar(false);
+
+        setErrorSnackbar(true);
+        return console.log(error);
+      }
+    })();
 
     //var asset = MediaLibrary.createAssetAsync("file://" + oneBook.image);
 
@@ -58,16 +77,15 @@ export default function DisplayOneBook({ route, navigation }) {
     //getAllValues();
 
     // await ensureDirExists();
-    FileSystem.downloadAsync(downloadURL, documentDirectory + oneBook.title)
-      .then(({ uri }) => {
-        console.log("finished downloading to ", uri);
-        Permissions.askAsync(Permissions.CAMERA_ROLL);
-        let ass = MediaLibrary.createAssetAsync(uri);
-        MediaLibrary.createAlbumAsync("readMore", ass, false);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
+    // FileSystem.downloadAsync(downloadURL, documentDirectory + oneBook.title)
+    //   .then(({ uri }) => {
+    //     console.log("finished downloading to ", uri);
+    //     let ass = MediaLibrary.createAssetAsync(uri);
+    //     MediaLibrary.createAlbumAsync("readMore", ass, false);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err.message);
+    //   });
   };
 
   //console.log(oneBook);
@@ -169,8 +187,8 @@ export default function DisplayOneBook({ route, navigation }) {
               />
             )}
             <Snackbar
-              visible={visibleSnackbar}
-              onDismiss={() => setVisibleSnackbar(false)}
+              visible={downloadingSnackbar}
+              onDismiss={() => setDownloadingSnackbar(false)}
               duration={3000}
               style={{
                 position: "absolute",
@@ -179,6 +197,30 @@ export default function DisplayOneBook({ route, navigation }) {
               }}
             >
               Downloading book..
+            </Snackbar>
+            <Snackbar
+              visible={finishedSnackbar}
+              onDismiss={() => setFinishedSnackbar(false)}
+              duration={3000}
+              style={{
+                position: "absolute",
+                top: 50,
+                backgroundColor: "#52af52",
+              }}
+            >
+              Book downloaded! Check your library
+            </Snackbar>
+            <Snackbar
+              visible={errorSnackbar}
+              onDismiss={() => setErrorSnackbar(false)}
+              duration={3000}
+              style={{
+                position: "absolute",
+                top: 50,
+                backgroundColor: "#ff0000",
+              }}
+            >
+              File couldn't be downloaded :(
             </Snackbar>
 
             <StatusBar style="auto" />

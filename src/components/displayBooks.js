@@ -39,6 +39,18 @@ export default function DisplayBooks(prop) {
 
   const deleteBook = (id) => {
     console.log("book deleting", id);
+
+    (async function () {
+      try {
+        let deletedBook = await deleteValue(id);
+        if (deletedBook === true) {
+          console.log(deletedBook);
+          prop.refreshLibrary();
+        }
+      } catch (error) {
+        return console.log(error);
+      }
+    })();
     //deleteValue(id);
   };
 

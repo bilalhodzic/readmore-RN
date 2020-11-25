@@ -1,30 +1,52 @@
 import React from "react";
-import { StyleSheet, ScrollView, View } from "react-native";
+import { StyleSheet, ScrollView, View, RefreshControl } from "react-native";
 import { Button, FAB } from "react-native-paper";
 import { insertValue, getAllValues, deleteValue } from "../../storage";
 import * as SQLite from "expo-sqlite";
 import DisplayBooks from "./displayBooks";
+import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 
 export default function Library({ navigation }) {
   const [libraryBooks, setLibraryBooks] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  //pull down to refresh library
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+
+    (async function () {
+      try {
+        let books = await getAllValues();
+        setLibraryBooks(books);
+        setRefreshing(false);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  });
 
   const scrollRef = React.useRef(null);
 
+  //On loading the component get all the books from database
   React.useEffect(() => {
-    const db = SQLite.openDatabase("books");
-
-    db.transaction((tx) => {
-      let sql = "select * from books";
-      tx.executeSql(sql, [], (_, { rows: { _array } }) => {
-        // console.log("iz baze: ", _array);
-        setLibraryBooks(_array);
-      });
-    });
+    (async function () {
+      try {
+        let books = await getAllValues();
+        setLibraryBooks(books);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
   }, []);
 
   return (
     <>
-      <ScrollView ref={scrollRef}>
+      <ScrollView
+        ref={scrollRef}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.container}>
           {libraryBooks &&
             libraryBooks.map((book, index) => (
@@ -32,6 +54,7 @@ export default function Library({ navigation }) {
                 book={book}
                 navigation={navigation}
                 pathname={"library"}
+                refreshLibrary={onRefresh}
                 key={index}
               />
             ))}

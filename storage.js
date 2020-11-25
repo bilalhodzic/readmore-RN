@@ -11,47 +11,67 @@ function checkTable() {
 }
 checkTable();
 
-export function insertValue(book) {
+export async function insertValue(book) {
   let sql = `insert into books(id,title,author,image,file,pages, extension) values (?, ?, ?, ?, ?, ?, ?)`;
-  db.transaction(
-    (tx) => {
-      tx.executeSql(sql, [
-        book.id,
-        book.title,
-        book.author,
-        book.image,
-        book.download, //book.file,
-        book.pages,
-        book.extension,
-      ]);
-    },
-    (err) => {
-      if (err) {
-        return console.error(err.message);
-      }
-    },
-    (result) => {
-      console.log("radi ", result);
-    }
-  );
-}
-export function getAllValues() {
-  db.transaction((tx) => {
-    let sql = "select * from books";
-    tx.executeSql(sql, [], (_, { rows: { _array } }) => {
-      console.log("iz baze: ", _array);
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        sql,
+        [
+          book.id,
+          book.title,
+          book.author,
+          book.image,
+          book.download, //book.file,
+          book.pages,
+          book.extension,
+        ],
+        (_) => {
+          console.log("Added one book");
+          resolve(true);
+        },
+        (err) => {
+          console.log("Error occured");
+          reject(err);
+        }
+      );
     });
   });
 }
-export function deleteValue(id) {
+export async function getAllValues() {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      let sql = "select * from books";
+      tx.executeSql(
+        sql,
+        [],
+        (_, { rows: { _array } }) => {
+          resolve(_array);
+        },
+        (err) => {
+          if (err) reject(err);
+        }
+      );
+    });
+  });
+}
+export async function deleteValue(id) {
   let sql = "delete from books where id = ?";
-  db.transaction(
-    (tx) => {
-      tx.executeSql(sql, [id]);
-    },
-    (err) => {
-      return console.log(err.message);
-    },
-    () => console.log("book deleted")
-  );
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        sql,
+        [id],
+        (_) => {
+          console.log("book deleted");
+          resolve(true);
+        },
+        (err) => {
+          console.log("error ocured");
+          reject(err);
+        }
+      );
+    });
+  });
 }
