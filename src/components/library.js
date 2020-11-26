@@ -4,7 +4,6 @@ import { Button, FAB } from "react-native-paper";
 import { insertValue, getAllValues, deleteValue } from "../../storage";
 import * as SQLite from "expo-sqlite";
 import DisplayBooks from "./displayBooks";
-import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 
 export default function Library({ navigation }) {
   const [libraryBooks, setLibraryBooks] = React.useState([]);
@@ -43,11 +42,12 @@ export default function Library({ navigation }) {
     <>
       <ScrollView
         ref={scrollRef}
+        contentContainerStyle={styles.container}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={styles.container}>
+        <View style={{ alignItems: "center" }}>
           {libraryBooks &&
             libraryBooks.map((book, index) => (
               <DisplayBooks
@@ -75,11 +75,9 @@ export default function Library({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
     padding: "2%",
-    //justifyContent: "center",
   },
   fab: {
     backgroundColor: "#ff0000",

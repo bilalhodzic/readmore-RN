@@ -20,11 +20,9 @@ import {
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import * as SQLite from "expo-sqlite";
 import HTML from "react-native-render-html";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { insertValue, getAllValues, deleteValue } from "../../storage";
-import { documentDirectory } from "expo-file-system";
+import { insertValue, getValueById, deleteValue } from "../../storage";
 
 const bookDir = FileSystem.documentDirectory + "books/";
 
@@ -34,6 +32,9 @@ export default function DisplayOneBook({ route, navigation }) {
   const [downloadingSnackbar, setDownloadingSnackbar] = React.useState(false);
   const [finishedSnackbar, setFinishedSnackbar] = React.useState(false);
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState(
+    "File couldn't be downloaded :( "
+  );
 
   const { oneBook, pathname } = route.params;
 
@@ -47,48 +48,58 @@ export default function DisplayOneBook({ route, navigation }) {
 
   const downloadFile = async () => {
     console.log("downloading book..");
+
+    //generating download link
     let downloadURL = getDLink(oneBook);
     //console.log(downloadURL);
+
+    //show to the user that downloading started
     setDownloadingSnackbar(true);
 
     (async function () {
       try {
+        //Check in database if book is downloaded already
+        let bookExist = await getValueById(oneBook.id);
+        if (bookExist !== undefined) {
+          setDownloadingSnackbar(false);
+
+          setErrorSnackbar(true);
+          setErrorMessage("Book already exist in library!");
+          return console.log("book already exist!");
+        }
+
+        await ensureDirExists();
+        //using expo filesystem to download files
+        let file = await FileSystem.downloadAsync(
+          downloadURL,
+          bookDir + oneBook.title
+        );
+        // .then(({ uri }) => {
+        //   console.log("finished downloading to ", uri);
+        //   let ass = MediaLibrary.createAssetAsync(uri);
+        //   MediaLibrary.createAlbumAsync("readMore", ass, false);
+        // })
+        // console.log("FILE: ", file.uri);
+
+        oneBook.file = file.uri;
+
+        //after the book is downloaded insert it into database
         let addBook = await insertValue(oneBook);
+        //insert will return true if everything is okay
         if (addBook === true) {
           setDownloadingSnackbar(false);
           setFinishedSnackbar(true);
         }
       } catch (error) {
         setDownloadingSnackbar(false);
+        FileSystem.deleteAsync(file.uri);
 
         setErrorSnackbar(true);
         return console.log(error);
       }
     })();
-
-    //var asset = MediaLibrary.createAssetAsync("file://" + oneBook.image);
-
-    //MediaLibrary.createAlbumAsync("readMore", asset, false);
-
-    //console.log(oneBook);
-
-    //insertValue(oneBook);
-    //deleteValue(oneBook.id);
-    //getAllValues();
-
-    // await ensureDirExists();
-    // FileSystem.downloadAsync(downloadURL, documentDirectory + oneBook.title)
-    //   .then(({ uri }) => {
-    //     console.log("finished downloading to ", uri);
-    //     let ass = MediaLibrary.createAssetAsync(uri);
-    //     MediaLibrary.createAlbumAsync("readMore", ass, false);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err.message);
-    //   });
   };
 
-  //console.log(oneBook);
   return (
     <>
       <Provider>
@@ -171,7 +182,7 @@ export default function DisplayOneBook({ route, navigation }) {
                 <Card.Content>
                   <HTML
                     tagsStyles={{ p: { textAlign: "center" } }}
-                    html={oneBook.descr}
+                    html={oneBook.descr || "No description"}
                   />
                 </Card.Content>
               </Card>
@@ -186,45 +197,46 @@ export default function DisplayOneBook({ route, navigation }) {
                 onPress={downloadFile}
               />
             )}
-            <Snackbar
-              visible={downloadingSnackbar}
-              onDismiss={() => setDownloadingSnackbar(false)}
-              duration={3000}
-              style={{
-                position: "absolute",
-                top: 50,
-                backgroundColor: "#000000CC",
-              }}
-            >
-              Downloading book..
-            </Snackbar>
-            <Snackbar
-              visible={finishedSnackbar}
-              onDismiss={() => setFinishedSnackbar(false)}
-              duration={3000}
-              style={{
-                position: "absolute",
-                top: 50,
-                backgroundColor: "#52af52",
-              }}
-            >
-              Book downloaded! Check your library
-            </Snackbar>
-            <Snackbar
-              visible={errorSnackbar}
-              onDismiss={() => setErrorSnackbar(false)}
-              duration={3000}
-              style={{
-                position: "absolute",
-                top: 50,
-                backgroundColor: "#ff0000",
-              }}
-            >
-              File couldn't be downloaded :(
-            </Snackbar>
+            {showDescription && <View style={{ height: 100 }} />}
 
             <StatusBar style="auto" />
           </View>
+          <Snackbar
+            visible={downloadingSnackbar}
+            onDismiss={() => setDownloadingSnackbar(false)}
+            duration={3000}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              backgroundColor: "#000000CC",
+            }}
+          >
+            Downloading book..
+          </Snackbar>
+          <Snackbar
+            visible={finishedSnackbar}
+            onDismiss={() => setFinishedSnackbar(false)}
+            duration={3000}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              backgroundColor: "#52af52",
+            }}
+          >
+            Book downloaded! Check your library
+          </Snackbar>
+          <Snackbar
+            visible={errorSnackbar}
+            onDismiss={() => setErrorSnackbar(false)}
+            duration={3000}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              backgroundColor: "#ff0000",
+            }}
+          >
+            {errorMessage}
+          </Snackbar>
         </ScrollView>
       </Provider>
 

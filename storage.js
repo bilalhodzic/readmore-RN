@@ -22,7 +22,7 @@ export async function insertValue(book) {
           book.title,
           book.author,
           book.image,
-          book.download, //book.file,
+          book.file, //book.download,
           book.pages,
           book.extension,
         ],
@@ -55,6 +55,24 @@ export async function getAllValues() {
     });
   });
 }
+export async function getValueById(id) {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      let sql = "select * from books where id = ?";
+      tx.executeSql(
+        sql,
+        [id],
+        (_, { rows: { _array } }) => {
+          resolve(_array[0]);
+        },
+        (err) => {
+          if (err) reject(err);
+        }
+      );
+    });
+  });
+}
+
 export async function deleteValue(id) {
   let sql = "delete from books where id = ?";
 

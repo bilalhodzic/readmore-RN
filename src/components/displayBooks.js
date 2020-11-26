@@ -12,7 +12,8 @@ import {
   Button,
   ProgressBar,
 } from "react-native-paper";
-import { insertValue, deleteValue } from "../../storage";
+import { deleteValue } from "../../storage";
+import * as FileSystem from "expo-file-system";
 
 export default function DisplayBooks(prop) {
   //console.log("prop is: ", prop);
@@ -25,7 +26,10 @@ export default function DisplayBooks(prop) {
         //nested navigation with parameters
         prop.navigation.navigate(prop.pathname, {
           screen: "oneBook",
-          params: { oneBook: response, pathname: prop.pathname },
+          params: {
+            oneBook: response,
+            pathname: prop.pathname,
+          },
         });
         console.log("oneBook is ready to display");
       })
@@ -37,14 +41,14 @@ export default function DisplayBooks(prop) {
     console.log("read book...");
   };
 
-  const deleteBook = (id) => {
-    console.log("book deleting", id);
+  const deleteBook = (book) => {
+    console.log("book deleting", book.id);
 
     (async function () {
       try {
-        let deletedBook = await deleteValue(id);
+        FileSystem.deleteAsync(book.file);
+        let deletedBook = await deleteValue(book.id);
         if (deletedBook === true) {
-          console.log(deletedBook);
           prop.refreshLibrary();
         }
       } catch (error) {
@@ -79,18 +83,13 @@ export default function DisplayBooks(prop) {
               visible={prop.book.pageRead > 1}
             ></ProgressBar>
             <View style={styles.libContainer}>
-              {/* <MaterialCommunityIcons
-                name="delete-circle"
-                color="#ff0000"
-                size={35}
-              /> */}
               <Button
                 color="#ff0000"
                 mode="contained"
                 dark={true}
                 uppercase={false}
                 icon="delete-circle"
-                onPress={() => deleteBook(prop.book.id)}
+                onPress={() => deleteBook(prop.book)}
               >
                 Delete book
               </Button>
