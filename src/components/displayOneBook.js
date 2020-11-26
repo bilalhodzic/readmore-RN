@@ -70,16 +70,16 @@ export default function DisplayOneBook({ route, navigation }) {
 
         await ensureDirExists();
         //using expo filesystem to download files
-        let file = await FileSystem.downloadAsync(
+        var file = await FileSystem.downloadAsync(
           downloadURL,
-          bookDir + oneBook.title
+          bookDir + oneBook.title + "." + oneBook.extension
         );
         // .then(({ uri }) => {
         //   console.log("finished downloading to ", uri);
         //   let ass = MediaLibrary.createAssetAsync(uri);
         //   MediaLibrary.createAlbumAsync("readMore", ass, false);
         // })
-        // console.log("FILE: ", file.uri);
+        //console.log("FILE: ", file.uri);
 
         oneBook.file = file.uri;
 
@@ -92,7 +92,7 @@ export default function DisplayOneBook({ route, navigation }) {
         }
       } catch (error) {
         setDownloadingSnackbar(false);
-        FileSystem.deleteAsync(file.uri);
+        //FileSystem.deleteAsync(file.uri);
 
         setErrorSnackbar(true);
         return console.log(error);

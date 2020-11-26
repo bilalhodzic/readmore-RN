@@ -37,8 +37,14 @@ export default function DisplayBooks(prop) {
         return console.log(err);
       });
   };
-  const readBook = () => {
+  const readBook = (book) => {
     console.log("read book...");
+    prop.navigation.navigate(prop.pathname, {
+      screen: "readBook",
+      params: {
+        oneBook: book,
+      },
+    });
   };
 
   const deleteBook = (book) => {
@@ -99,7 +105,7 @@ export default function DisplayBooks(prop) {
                 dark={true}
                 uppercase={false}
                 icon="book-open-page-variant"
-                onPress={readBook}
+                onPress={() => readBook(prop.book)}
               >
                 {" "}
                 {prop.book.pageRead > 1 ? "Continue reading" : "Start reading"}

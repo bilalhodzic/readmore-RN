@@ -1,10 +1,12 @@
 import * as React from "react";
 import MainPage from "./mainPage";
 import Library from "./library";
+import ReadBook from "./readBook";
 import DisplayOneBook from "./displayOneBook";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import readBook from "./readBook";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -38,6 +40,7 @@ function libraryStackScreen() {
         component={Library}
       />
       <Stack.Screen name="oneBook" component={DisplayOneBook} />
+      <Stack.Screen name="readBook" component={readBook} />
     </Stack.Navigator>
   );
 }
