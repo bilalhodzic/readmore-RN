@@ -52,7 +52,7 @@ export default function DisplayBooks(prop) {
 
     (async function () {
       try {
-        FileSystem.deleteAsync(book.file);
+        await FileSystem.deleteAsync(book.file);
         let deletedBook = await deleteValue(book.id);
         if (deletedBook === true) {
           prop.refreshLibrary();
@@ -61,7 +61,6 @@ export default function DisplayBooks(prop) {
         return console.log(error);
       }
     })();
-    //deleteValue(id);
   };
 
   return (

@@ -16,13 +16,15 @@ import {
   Portal,
   Provider,
   Snackbar,
+  ProgressBar,
 } from "react-native-paper";
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import HTML from "react-native-render-html";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { insertValue, getValueById, deleteValue } from "../../storage";
+import { insertValue, getValueById } from "../../storage";
+import { downloadFile } from "../../helpers";
 
 const bookDir = FileSystem.documentDirectory + "books/";
 
@@ -32,6 +34,7 @@ export default function DisplayOneBook({ route, navigation }) {
   const [downloadingSnackbar, setDownloadingSnackbar] = React.useState(false);
   const [finishedSnackbar, setFinishedSnackbar] = React.useState(false);
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
+  const [downloadProgress, setDownloadProgress] = React.useState(0);
   const [errorMessage, setErrorMessage] = React.useState(
     "File couldn't be downloaded :( "
   );
@@ -188,14 +191,20 @@ export default function DisplayOneBook({ route, navigation }) {
               </Card>
             )}
             {pathname !== "library" && (
-              <FAB
-                label="Download now"
-                icon="download"
-                color="white"
-                uppercase={false}
-                style={styles.fab}
-                onPress={downloadFile}
-              />
+              <>
+                <FAB
+                  label="Download now"
+                  icon="download"
+                  color="white"
+                  uppercase={false}
+                  style={styles.fab}
+                  onPress={downloadFile}
+                />
+                <ProgressBar
+                  progress={downloadProgress}
+                  style={{ margin: 10 }}
+                />
+              </>
             )}
             {showDescription && <View style={{ height: 100 }} />}
 

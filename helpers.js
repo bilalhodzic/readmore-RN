@@ -41,7 +41,48 @@ export function getDLink(book) {
 //   });
 // }
 
-async function downloadFile(downloadURL, fileurl) {}
+async function downloadFile(downloadURL, fileurl) {
+  const callback = (downloadProgress) => {
+    const progress =
+      downloadProgress.totalBytesWritten /
+      downloadProgress.totalBytesExpectedToWrite;
+    this.setState({
+      downloadProgress: progress,
+    });
+  };
+  const downloadResumable = FileSystem.createDownloadResumable(
+    downloadURL,
+    fileurl,
+
+    {},
+    callback
+  );
+
+  try {
+    const { uri } = await downloadResumable.downloadAsync();
+    console.log("Finished downloading to ", uri);
+    return uri;
+  } catch (e) {
+    console.error(e);
+  }
+  try {
+    await downloadResumable.pauseAsync();
+    console.log("Paused download operation, saving for future retrieval");
+    AsyncStorage.setItem(
+      "pausedDownload",
+      JSON.stringify(downloadResumable.savable())
+    );
+  } catch (e) {
+    console.error(e);
+  }
+  try {
+    const { uri } = await downloadResumable.resumeAsync();
+    console.log("Finished downloading to ", uri);
+    return uri;
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 // exports.downloadFile = downloadFile;
 // exports.getDLinks = getDLinks;
