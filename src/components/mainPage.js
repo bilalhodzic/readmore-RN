@@ -5,10 +5,13 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   ScrollView,
+  View,
   FlatList,
 } from "react-native";
 import { searchBooks } from "../../libgen-api/search";
 import DisplayBooks from "./displayBooks";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import {
   Headline,
   HelperText,
@@ -17,6 +20,7 @@ import {
   Searchbar,
   Button,
   FAB,
+  Snackbar,
 } from "react-native-paper";
 
 const theme = {
@@ -35,21 +39,40 @@ const DismissKeyboard = ({ children }) => (
   </TouchableWithoutFeedback>
 );
 
+//options to search within the libgen-api
+
+var searchOptions = {
+  query: "search",
+  page: 1,
+  //sort:def, //order by id, title, author..
+  //sortMode: ASC  //sort by asc or desc
+  //resNumber:25 //Numberr of result per page (default 25)
+};
+
 export default function MainPage({ navigation }) {
-  const [searchQuery, setSearchQuery] = React.useState("search");
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
   const [books, setBooks] = React.useState([]);
   const [totalBooks, setTotalBooks] = React.useState(1);
+  const [isListEnd, setIsListEnd] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("no error");
+  const [errorSnackbar, setErrorSnackbar] = React.useState(false);
+  const [noResults, setNoResults] = React.useState(false);
 
   const scrollRef = React.useRef(null);
 
   const getBooks = () => {
-    if (searchQuery.length < 4) {
+    if (searchOptions.query.length < 4) {
       setSearchError(true);
       return;
     }
-    console.log("searchQuery is: ", searchQuery);
+
+    console.log(
+      "search Query is: ",
+      searchOptions.query,
+      " Page: ",
+      searchOptions.page
+    );
 
     //if the error is displayed--hide it
     setSearchError(false);
@@ -57,33 +80,109 @@ export default function MainPage({ navigation }) {
     //dispplay loading indicator--until it loads the data
     setActivityLoad(true);
 
-    //options to search within the libgen-api
-    let options = {
-      query: searchQuery,
-      page: 1,
-      //sort:def, //order by id, title, author..
-      //sortMode: ASC  //sort by asc or desc
-      //resNumber:25 //Numberr of result per page (default 25)
-    };
-
-    searchBooks(options)
+    searchBooks(searchOptions)
       .then((data) => {
         //stop loading indicator and set books to state
         setActivityLoad(false);
-        setBooks(data.slice(1));
+
+        //if there is no results exit function
+        if (data[0].numberOfFiles == 0) {
+          setBooks([]);
+          setNoResults(true);
+
+          return;
+        }
+
+        //for now only pdf books are supported
+        let bookstoDisplay = [];
+        data.forEach((book) => {
+          if (book.extension === "pdf") {
+            bookstoDisplay.push(book);
+          }
+        });
+
+        //at the first index is number of total books
         setTotalBooks(data[0].numberOfFiles);
+        setNoResults(false);
 
-        //console.log('Total books: ',totalBooks)
-
-        //console.log(data)
+        setBooks(bookstoDisplay);
+        backToTop();
       })
       .catch((err) => {
-        console.log(err.message);
+        setActivityLoad(false);
+        setErrorMessage(err.message);
+        setErrorSnackbar(true);
+
+        return console.log("Error: ", err.message);
       });
   };
 
   const backToTop = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
+  const renderListFooter = () => {
+    return (
+      <View style={{ padding: 10 }}>
+        {activityLoad ? (
+          <ActivityIndicator color="black" style={{ margin: 15 }} />
+        ) : null}
+      </View>
+    );
+  };
+
+  const itemView = ({ item }) => {
+    return (
+      <DisplayBooks
+        book={item}
+        navigation={navigation}
+        pathname={"mainPage"}
+        //key={index}
+      />
+    );
+  };
+
+  const NavFooter = () => {
+    return (
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <Button
+          mode="contained"
+          color="#7fb7f2"
+          icon="page-previous-outline"
+          disabled={searchOptions.page === 1}
+          contentStyle={{ height: 40 }}
+          uppercase={false}
+          dark={true}
+          style={{ borderRadius: 20, margin: 15 }}
+          onPress={() => {
+            searchOptions.page -= 1;
+            getBooks();
+          }}
+        >
+          Prev
+        </Button>
+        <Button
+          mode="contained"
+          color="#7fb7f2"
+          contentStyle={{ height: 40 }}
+          uppercase={false}
+          dark={true}
+          style={{ borderRadius: 20, margin: 15 }}
+          onPress={() => {
+            searchOptions.page += 1;
+            getBooks();
+          }}
+        >
+          Next <MaterialCommunityIcons name="page-next-outline" size={14} />
+        </Button>
+      </View>
+    );
   };
 
   return (
@@ -96,10 +195,12 @@ export default function MainPage({ navigation }) {
             </Headline>
             <Searchbar
               placeholder="Search any book"
-              value={searchQuery}
+              //value={searchOptions.query}
               style={{ margin: 15, marginBottom: 5 }}
               onIconPress={getBooks}
-              onChangeText={(text) => setSearchQuery(text)}
+              onChangeText={(text) => (
+                (searchOptions.page = 1), (searchOptions.query = text)
+              )}
             />
 
             <HelperText type="error" visible={searchError}>
@@ -124,6 +225,16 @@ export default function MainPage({ navigation }) {
             >
               Search books
             </Button>
+            {/* <SafeAreaView style={{ flex: 1 }}>
+              <FlatList
+                data={books}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={itemView}
+                ListFooterComponent={renderListFooter}
+                onEndReached={getBooks}
+                //onEndReachedThreshold={0.5}
+              />
+            </SafeAreaView> */}
 
             {books &&
               books.map((book, index) => (
@@ -134,6 +245,33 @@ export default function MainPage({ navigation }) {
                   key={index}
                 />
               ))}
+            <HelperText
+              type="error"
+              style={{
+                fontSize: 15,
+                borderBottomWidth: 0.5,
+                borderBottomColor: "lightgray",
+              }}
+              visible={noResults}
+            >
+              {`0 results found for "${searchOptions.query}"`}
+            </HelperText>
+            {books.length > 0 && errorMessage === "no error" ? (
+              <NavFooter />
+            ) : (
+              <View style={{ height: 35, width: "100%" }}>
+                <Snackbar
+                  visible={errorSnackbar}
+                  onDismiss={() => setErrorSnackbar(false)}
+                  duration={7000}
+                  style={{
+                    backgroundColor: "gray",
+                  }}
+                >
+                  {errorMessage}
+                </Snackbar>
+              </View>
+            )}
           </SafeAreaView>
         </ScrollView>
         <ActivityIndicator

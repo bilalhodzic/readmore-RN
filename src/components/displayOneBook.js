@@ -35,6 +35,7 @@ export default function DisplayOneBook({ route, navigation }) {
   const [finishedSnackbar, setFinishedSnackbar] = React.useState(false);
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
   const [downloadProgress, setDownloadProgress] = React.useState(0);
+  const [disabledButton, setDisabledButton] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState(
     "File couldn't be downloaded :( "
   );
@@ -58,6 +59,7 @@ export default function DisplayOneBook({ route, navigation }) {
 
     //show to the user that downloading started
     setDownloadingSnackbar(true);
+    setDisabledButton(true);
 
     (async function () {
       try {
@@ -68,6 +70,7 @@ export default function DisplayOneBook({ route, navigation }) {
 
           setErrorSnackbar(true);
           setErrorMessage("Book already exist in library!");
+          setDisabledButton(true);
           return console.log("book already exist!");
         }
 
@@ -77,11 +80,7 @@ export default function DisplayOneBook({ route, navigation }) {
           downloadURL,
           bookDir + oneBook.title + "." + oneBook.extension
         );
-        // .then(({ uri }) => {
-        //   console.log("finished downloading to ", uri);
-        //   let ass = MediaLibrary.createAssetAsync(uri);
-        //   MediaLibrary.createAlbumAsync("readMore", ass, false);
-        // })
+
         //console.log("FILE: ", file.uri);
 
         oneBook.file = file.uri;
@@ -96,6 +95,7 @@ export default function DisplayOneBook({ route, navigation }) {
       } catch (error) {
         setDownloadingSnackbar(false);
         //FileSystem.deleteAsync(file.uri);
+        setDisabledButton(false);
 
         setErrorSnackbar(true);
         return console.log(error);
@@ -196,14 +196,15 @@ export default function DisplayOneBook({ route, navigation }) {
                   label="Download now"
                   icon="download"
                   color="white"
+                  disabled={disabledButton}
                   uppercase={false}
                   style={styles.fab}
                   onPress={downloadFile}
                 />
-                <ProgressBar
+                {/* <ProgressBar
                   progress={downloadProgress}
                   style={{ margin: 10 }}
-                />
+                /> */}
               </>
             )}
             {showDescription && <View style={{ height: 100 }} />}

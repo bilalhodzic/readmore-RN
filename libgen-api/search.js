@@ -4,7 +4,7 @@ const axios = require("react-native-axios");
 export const searchBooks = async (options) => {
   //return error if the search is bad
   if (!options.query || options.query.length < 3) {
-    return new Error("Search query is bad. Try again.");
+    throw new Error("Search query is bad. Try again.");
   }
 
   //default number page is 1
@@ -29,7 +29,7 @@ export const searchBooks = async (options) => {
   const response = await axios.get(siteURL);
 
   if (response === null || response === undefined) {
-    return new Error("Couldn't get the response! Try again");
+    throw new Error("Couldn't get the response! Try again");
   }
 
   //gives the Jquery functionality on node.js
@@ -37,6 +37,11 @@ export const searchBooks = async (options) => {
     normalizeWhitespace: true,
     xmlMode: true,
   });
+
+  //if there is no books in the given URL (reached the end of the search)
+  if ($('font:contains("Pages")').length === 1 && page > 1) {
+    throw new Error("No next page available");
+  }
 
   //search tagName 'font'-- index [2] is always  number of files
   let filesFound = $("font")[2].children[0].data;
@@ -55,11 +60,14 @@ export const searchBooks = async (options) => {
     let getPage = $("font:contains('Pages')")[i + 1].parent.next.next
       .children[0];
 
+    //only td with attr colspan=2 has the title data
+    let getTitle = $("td[colspan='2']")[i].children[0].children[0].children[0];
+
     books.push({
       image: `http://gen.lib.rus.ec${$("img")[i].attribs.src}`,
 
-      //only td with attr colspan=2 has the title data
-      title: $("td[colspan='2']")[i].children[0].children[0].children[0].data,
+      //In some cases there is no title, we need to check and handle that
+      title: getTitle !== undefined ? getTitle.data : "No title",
       id: $("font:contains('ID')")[i + 1].parent.next.next.children[0].data,
 
       //need to check if there is number of pages
@@ -68,70 +76,58 @@ export const searchBooks = async (options) => {
         .children[0].data,
     });
 
-
-
     //on some books there are more than one authors
     let getAuthor = $("td[colspan='3'] b a")[authorIndex];
 
     //always increment author index after calling getAuthor
     authorIndex += 1;
 
-  //on some books there is no author--we need to check that
-    if(getAuthor.children[0]===undefined){
-      books[i+1].author='undefined';
-    }
-    else{
-    books[i + 1].author = getAuthor.children[0].data;
+    //on some books there is no author--we need to check that
+    if (getAuthor.children[0] === undefined) {
+      books[i + 1].author = "undefined";
+    } else {
+      books[i + 1].author = getAuthor.children[0].data;
 
+      //Check if there is more authors
+      if (getAuthor.next !== null) {
+        //call another time because index has changed
+        getAuthor = $("td[colspan='3'] b a")[authorIndex];
+        authorIndex += 1;
 
+        //while loop to check all the author from the book
+        do {
+          //first add another author
+          books[i + 1].author += ", " + getAuthor.children[0].data;
 
-
-    //Check if there is more authors
-    if (getAuthor.next !== null) {
-      //call another time because index has changed
-      getAuthor = $("td[colspan='3'] b a")[authorIndex];
-      authorIndex += 1;
-
-      //while loop to check all the author from the book
-      do {
-        //first add another author
-        books[i + 1].author += ", " + getAuthor.children[0].data;
-
-        //then check if there is another one
-        if (getAuthor.next === null) break;
-        else {
-          getAuthor = $("td[colspan='3'] b a")[authorIndex];
-          authorIndex += 1;
-        }
-      } while (getAuthor.next !== null);
+          //then check if there is another one
+          if (getAuthor.next === null) break;
+          else {
+            getAuthor = $("td[colspan='3'] b a")[authorIndex];
+            authorIndex += 1;
+          }
+        } while (getAuthor.next !== null);
+      }
     }
   }
 
-  }
-
-//return array of books
+  //return array of books
   return books;
 };
 
 //options example
-var options={
-  query:'example',
+var options = {
+  query: "example",
 
   //default 1
-  page:2,
+  page: 2,
 
   //Order by: ID, Title, Publisher, Year, Pages, Language, Size, Extension
-  sort:'def',
+  sort: "def",
 
   //ASC(default) or DESC
-  sortMode:'ASC',
+  sortMode: "ASC",
 
   //number of results per one page--default to 25
-  resNumber:25,
-
-
-}
-//searchBooks(options)
-
-
-
+  resNumber: 25,
+};
+//searchBooks(options);
