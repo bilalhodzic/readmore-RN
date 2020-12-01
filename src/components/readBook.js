@@ -19,13 +19,6 @@ export default function ReadBook({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* <Button
-        onPress={() => {
-          navigation.goBack();
-        }}
-      >
-        Go back
-      </Button> */}
       <PDFReader
         source={{ uri: oneBook.file, headers: { key: "string" } }}
         withPinchZoom={true}
@@ -35,9 +28,13 @@ export default function ReadBook({ route, navigation }) {
             backgroundColor: "#fff",
             padding: 0,
           },
+          readerContainerZoomContainer: {
+            borderRadius: 30,
+            backgroundColor: "#00000099",
+          },
           readerContainerNumbersContent: {
             marginTop: 10,
-            backgroundColor: "gray",
+            backgroundColor: "#00000099",
           },
           readerContainerDocument: {
             backgroundColor: "#fff",
@@ -50,10 +47,10 @@ export default function ReadBook({ route, navigation }) {
           },
           readerContainerNavigateArrow: {
             //border: "2px solid red",
-            borderRadius: 20,
+            borderRadius: 10,
             fontSize: 30,
             color: "white",
-            backgroundColor: "gray",
+            backgroundColor: "#00000099",
           },
         }}
       />

@@ -39,25 +39,27 @@ const DismissKeyboard = ({ children }) => (
   </TouchableWithoutFeedback>
 );
 
-//options to search within the libgen-api
-
-var searchOptions = {
-  query: "search",
-  page: 1,
-  //sort:def, //order by id, title, author..
-  //sortMode: ASC  //sort by asc or desc
-  //resNumber:25 //Numberr of result per page (default 25)
-};
-
 export default function MainPage({ navigation }) {
+  var defaultErrorMsg = "No Error";
+  var defaultQuerySearch = "";
+
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState(defaultQuerySearch);
   const [books, setBooks] = React.useState([]);
   const [totalBooks, setTotalBooks] = React.useState(1);
-  const [isListEnd, setIsListEnd] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("no error");
+  const [errorMessage, setErrorMessage] = React.useState(defaultErrorMsg);
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
   const [noResults, setNoResults] = React.useState(false);
+
+  //options to search within the libgen-api
+  var searchOptions = {
+    query: searchQuery,
+    page: 1,
+    sort: "def", //order by id, title, author..
+    sortMode: "ASC", //sort by asc or desc
+    resNumber: 25, //Numberr of result per page (default 25)
+  };
 
   const scrollRef = React.useRef(null);
 
@@ -73,6 +75,9 @@ export default function MainPage({ navigation }) {
       " Page: ",
       searchOptions.page
     );
+
+    //set default message to default on new search
+    setErrorMessage(defaultErrorMsg);
 
     //if the error is displayed--hide it
     setSearchError(false);
@@ -195,12 +200,10 @@ export default function MainPage({ navigation }) {
             </Headline>
             <Searchbar
               placeholder="Search any book"
-              //value={searchOptions.query}
+              value={searchQuery}
               style={{ margin: 15, marginBottom: 5 }}
               onIconPress={getBooks}
-              onChangeText={(text) => (
-                (searchOptions.page = 1), (searchOptions.query = text)
-              )}
+              onChangeText={(text) => setSearchQuery(text)}
             />
 
             <HelperText type="error" visible={searchError}>
@@ -256,7 +259,7 @@ export default function MainPage({ navigation }) {
             >
               {`0 results found for "${searchOptions.query}"`}
             </HelperText>
-            {books.length > 0 && errorMessage === "no error" ? (
+            {books.length > 0 && errorMessage === defaultErrorMsg ? (
               <NavFooter />
             ) : (
               <View style={{ height: 35, width: "100%" }}>
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
     marginTop: "30%",
   },
   fab: {
-    backgroundColor: "#ff0000",
+    backgroundColor: "#ff1919CC",
     position: "absolute",
     bottom: 30,
     right: 30,

@@ -214,7 +214,7 @@ export default function DisplayOneBook({ route, navigation }) {
           <Snackbar
             visible={downloadingSnackbar}
             onDismiss={() => setDownloadingSnackbar(false)}
-            duration={3000}
+            duration={10000}
             style={{
               position: "absolute",
               bottom: 0,
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   fabBack: {
-    backgroundColor: "#ff0000",
+    backgroundColor: "#ff1919CC",
     position: "absolute",
     bottom: 30,
     right: 30,

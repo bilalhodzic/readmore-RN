@@ -7,16 +7,21 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import readBook from "./readBook";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const screenOptionsStyles = {
   headerStyle: {
-    backgroundColor: "#7b9cc6",
+    backgroundColor: "#0063ccB3",
     height: 80,
+    borderBottomWidth: 3,
+    borderRadius: 3,
+    borderBottomColor: "#7fb7f2CC",
   },
-  headerTitle: "Read more",
+
+  headerTitle: "ReadMore",
   headerTitleAlign: "center",
   headerTintColor: "white",
   headerBackTitle: "Back",
@@ -50,7 +55,11 @@ export default function BottomNav() {
     <NavigationContainer>
       <Tab.Navigator
         initialRouteName="mainPage"
-        barStyle={{ backgroundColor: "#0063cc" }}
+        barStyle={{
+          backgroundColor: "#0063ccCC",
+          borderTopWidth: 1,
+          borderTopColor: "lightgray",
+        }}
       >
         <Tab.Screen
           name="mainPage"
