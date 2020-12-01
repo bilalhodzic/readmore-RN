@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   View,
+  Image,
   FlatList,
 } from "react-native";
 import { searchBooks } from "../../libgen-api/search";
@@ -195,6 +196,10 @@ export default function MainPage({ navigation }) {
       <>
         <ScrollView ref={scrollRef} contentContainerStyle={styles.container}>
           <SafeAreaView style={{ alignItems: "center" }}>
+            <Image
+              style={{ width: 100, height: 100 }}
+              source={require("../../assets/icon.png")}
+            />
             <Headline style={styles.heading}>
               Search millions of{"\n"} books online
             </Headline>
@@ -313,7 +318,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     letterSpacing: 1,
     fontSize: 25,
-    marginTop: "30%",
+    //marginTop: "30%",
   },
   fab: {
     backgroundColor: "#ff1919CC",
