@@ -47,6 +47,7 @@ export default function MainPage({ navigation }) {
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState(defaultQuerySearch);
+  const [searchPage, setSearchPage] = React.useState(1);
   const [books, setBooks] = React.useState([]);
   const [totalBooks, setTotalBooks] = React.useState(1);
   const [errorMessage, setErrorMessage] = React.useState(defaultErrorMsg);
@@ -56,7 +57,7 @@ export default function MainPage({ navigation }) {
   //options to search within the libgen-api
   var searchOptions = {
     query: searchQuery,
-    page: 1,
+    page: searchPage,
     sort: "def", //order by id, title, author..
     sortMode: "ASC", //sort by asc or desc
     resNumber: 25, //Numberr of result per page (default 25)
@@ -91,14 +92,6 @@ export default function MainPage({ navigation }) {
         //stop loading indicator and set books to state
         setActivityLoad(false);
 
-        //if there is no results exit function
-        if (data[0].numberOfFiles == 0) {
-          setBooks([]);
-          setNoResults(true);
-
-          return;
-        }
-
         //for now only pdf books are supported
         let bookstoDisplay = [];
         data.forEach((book) => {
@@ -107,6 +100,13 @@ export default function MainPage({ navigation }) {
           }
         });
 
+        //if there is no results exit function
+        if (data[0].numberOfFiles == 0 || bookstoDisplay.length === 0) {
+          setBooks([]);
+          setNoResults(true);
+
+          return;
+        }
         //at the first index is number of total books
         setTotalBooks(data[0].numberOfFiles);
         setNoResults(false);
@@ -127,27 +127,6 @@ export default function MainPage({ navigation }) {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
-  const renderListFooter = () => {
-    return (
-      <View style={{ padding: 10 }}>
-        {activityLoad ? (
-          <ActivityIndicator color="black" style={{ margin: 15 }} />
-        ) : null}
-      </View>
-    );
-  };
-
-  const itemView = ({ item }) => {
-    return (
-      <DisplayBooks
-        book={item}
-        navigation={navigation}
-        pathname={"mainPage"}
-        //key={index}
-      />
-    );
-  };
-
   const NavFooter = () => {
     return (
       <View
@@ -161,13 +140,13 @@ export default function MainPage({ navigation }) {
           mode="contained"
           color="#7fb7f2"
           icon="page-previous-outline"
-          disabled={searchOptions.page === 1}
+          disabled={searchPage === 1}
           contentStyle={{ height: 40 }}
           uppercase={false}
           dark={true}
           style={{ borderRadius: 20, margin: 15 }}
           onPress={() => {
-            searchOptions.page -= 1;
+            setSearchPage(searchPage - 1);
             getBooks();
           }}
         >
@@ -181,7 +160,7 @@ export default function MainPage({ navigation }) {
           dark={true}
           style={{ borderRadius: 20, margin: 15 }}
           onPress={() => {
-            searchOptions.page += 1;
+            setSearchPage(searchPage + 1);
             getBooks();
           }}
         >
@@ -233,16 +212,6 @@ export default function MainPage({ navigation }) {
             >
               Search books
             </Button>
-            {/* <SafeAreaView style={{ flex: 1 }}>
-              <FlatList
-                data={books}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={itemView}
-                ListFooterComponent={renderListFooter}
-                onEndReached={getBooks}
-                //onEndReachedThreshold={0.5}
-              />
-            </SafeAreaView> */}
 
             {books &&
               books.map((book, index) => (
