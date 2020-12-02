@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "readmore-RN",
-    "slug": "readmore-RN",
+    "name": "ReadMore",
+    "slug": "ReadMore",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,6 +21,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "package": "com.bilalhodzic.ReadMore"
     }
   }
 }
