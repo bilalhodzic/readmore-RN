@@ -1,8 +1,7 @@
 const cheerio = require("react-native-cheerio");
 const axios = require("react-native-axios");
 
-//export
-const searchBooks = async (options) => {
+export const searchBooks = async (options) => {
   //return error if the search is bad
   if (!options.query || options.query.length < 3) {
     throw new Error("Search query is bad. Try again.");
@@ -136,4 +135,4 @@ var options = {
   //number of results per one page--default to 25
   resNumber: 25,
 };
-searchBooks(options);
+//searchBooks(options);

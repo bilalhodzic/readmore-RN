@@ -47,33 +47,32 @@ export default function MainPage({ navigation }) {
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState(defaultQuerySearch);
-  const [searchPage, setSearchPage] = React.useState(1);
   const [books, setBooks] = React.useState([]);
   const [totalBooks, setTotalBooks] = React.useState(1);
   const [errorMessage, setErrorMessage] = React.useState(defaultErrorMsg);
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
   const [noResults, setNoResults] = React.useState(false);
 
+  const scrollRef = React.useRef(null);
+
   //options to search within the libgen-api
   var searchOptions = {
     query: searchQuery,
-    page: searchPage,
+    page: 1,
     sort: "def", //order by id, title, author..
     sortMode: "ASC", //sort by asc or desc
     resNumber: 25, //Numberr of result per page (default 25)
   };
 
-  const scrollRef = React.useRef(null);
-
   const getBooks = () => {
-    if (searchOptions.query.length < 4) {
+    if (searchQuery.length < 4) {
       setSearchError(true);
       return;
     }
 
     console.log(
       "search Query is: ",
-      searchOptions.query,
+      searchQuery,
       " Page: ",
       searchOptions.page
     );
@@ -104,6 +103,7 @@ export default function MainPage({ navigation }) {
         if (data[0].numberOfFiles == 0 || bookstoDisplay.length === 0) {
           setBooks([]);
           setNoResults(true);
+          searchOptions.page = 1;
 
           return;
         }
@@ -118,6 +118,7 @@ export default function MainPage({ navigation }) {
         setActivityLoad(false);
         setErrorMessage(err.message);
         setErrorSnackbar(true);
+        searchOptions.page = 1;
 
         return console.log("Error: ", err.message);
       });
@@ -140,13 +141,14 @@ export default function MainPage({ navigation }) {
           mode="contained"
           color="#7fb7f2"
           icon="page-previous-outline"
-          disabled={searchPage === 1}
+          disabled={searchOptions.page === 1}
           contentStyle={{ height: 40 }}
           uppercase={false}
           dark={true}
           style={{ borderRadius: 20, margin: 15 }}
           onPress={() => {
-            setSearchPage(searchPage - 1);
+            searchOptions.page -= 1;
+
             getBooks();
           }}
         >
@@ -160,7 +162,7 @@ export default function MainPage({ navigation }) {
           dark={true}
           style={{ borderRadius: 20, margin: 15 }}
           onPress={() => {
-            setSearchPage(searchPage + 1);
+            searchOptions.page += 1;
             getBooks();
           }}
         >
@@ -231,7 +233,7 @@ export default function MainPage({ navigation }) {
               }}
               visible={noResults}
             >
-              {`0 results found for "${searchOptions.query}"`}
+              {`0 results found for "${searchQuery}" for page ${searchOptions.page} `}
             </HelperText>
             {books.length > 0 && errorMessage === defaultErrorMsg ? (
               <NavFooter />
