@@ -1,7 +1,8 @@
 const cheerio = require("react-native-cheerio");
 const axios = require("react-native-axios");
 
-export const searchBooks = async (options) => {
+//export
+const searchBooks = async (options) => {
   //return error if the search is bad
   if (!options.query || options.query.length < 3) {
     throw new Error("Search query is bad. Try again.");
@@ -56,19 +57,24 @@ export const searchBooks = async (options) => {
   var authorIndex = 0;
 
   for (var i = 0; i < loopLength; i++) {
-    //sometimes there is no page number
-    let getPage = $("font:contains('Pages')")[i + 1].parent.next.next
-      .children[0];
+    if ($("font:contains('ID')")[i + 1] === undefined) {
+      break;
+    }
+    let getID = $("font:contains('ID')")[i + 1].parent.next.next.children[0];
 
     //only td with attr colspan=2 has the title data
     let getTitle = $("td[colspan='2']")[i].children[0].children[0].children[0];
+
+    //sometimes there is no page number
+    let getPage = $("font:contains('Pages')")[i + 1].parent.next.next
+      .children[0];
 
     books.push({
       image: `http://gen.lib.rus.ec${$("img")[i].attribs.src}`,
 
       //In some cases there is no title, we need to check and handle that
       title: getTitle !== undefined ? getTitle.data : "No title",
-      id: $("font:contains('ID')")[i + 1].parent.next.next.children[0].data,
+      id: getID.data,
 
       //need to check if there is number of pages
       pages: getPage !== undefined ? getPage.data : 0,
@@ -116,7 +122,7 @@ export const searchBooks = async (options) => {
 
 //options example
 var options = {
-  query: "example",
+  query: "rhonda byrne",
 
   //default 1
   page: 2,
@@ -130,4 +136,4 @@ var options = {
   //number of results per one page--default to 25
   resNumber: 25,
 };
-//searchBooks(options);
+searchBooks(options);
