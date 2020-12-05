@@ -22,6 +22,12 @@ import {
   Button,
   FAB,
   Snackbar,
+  Dialog,
+  Portal,
+  Subheading,
+  Provider,
+  RadioButton,
+  Surface,
 } from "react-native-paper";
 
 const theme = {
@@ -43,15 +49,19 @@ const DismissKeyboard = ({ children }) => (
 export default function MainPage({ navigation }) {
   var defaultErrorMsg = "No Error";
   var defaultQuerySearch = "";
+  var defaultSortBy = "Title";
 
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState(defaultQuerySearch);
+  const [visibleDialog, setVisibleDialog] = React.useState(false);
+
   const [books, setBooks] = React.useState([]);
   const [totalBooks, setTotalBooks] = React.useState(1);
   const [errorMessage, setErrorMessage] = React.useState(defaultErrorMsg);
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
   const [noResults, setNoResults] = React.useState(false);
+  const [sortBy, setSortBy] = React.useState("ID");
 
   const scrollRef = React.useRef(null);
 
@@ -59,7 +69,7 @@ export default function MainPage({ navigation }) {
   var searchOptions = {
     query: searchQuery,
     page: 1,
-    sort: "def", //order by id, title, author..
+    sort: sortBy, //order by id, title, author..
     sortMode: "ASC", //sort by asc or desc
     resNumber: 25, //Numberr of result per page (default 25)
   };
@@ -74,7 +84,9 @@ export default function MainPage({ navigation }) {
       "search Query is: ",
       searchQuery,
       " Page: ",
-      searchOptions.page
+      searchOptions.page,
+      " Sort by: ",
+      searchOptions.sort
     );
 
     //set default message to default on new search
@@ -174,7 +186,7 @@ export default function MainPage({ navigation }) {
 
   return (
     <DismissKeyboard>
-      <>
+      <Provider>
         <ScrollView ref={scrollRef} contentContainerStyle={styles.container}>
           <SafeAreaView style={{ alignItems: "center" }}>
             <Image
@@ -196,6 +208,79 @@ export default function MainPage({ navigation }) {
               Search text has to be at least 4 characters!
             </HelperText>
 
+            <Subheading
+              onPress={() => {
+                setVisibleDialog(true);
+              }}
+              style={{
+                paddingBottom: 4,
+                paddingRight: 20,
+                paddingLeft: 20,
+                marginBottom: 6,
+                borderBottomColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              Sort by: "{sortBy}"
+            </Subheading>
+            <Portal>
+              <Dialog
+                visible={visibleDialog}
+                onDismiss={() => setVisibleDialog(false)}
+              >
+                <Dialog.Title>Sort by:</Dialog.Title>
+                <Dialog.Content>
+                  <RadioButton.Item
+                    label={"ID (default)"}
+                    value="ID"
+                    status={sortBy === "ID" ? "checked" : "unchecked"}
+                    onPress={() => setSortBy("ID")}
+                    color={"#7fb7f2"}
+                    uncheckedColor={"lightgray"}
+                  />
+                  <RadioButton.Item
+                    label={"Title"}
+                    value="Title"
+                    status={sortBy === "Title" ? "checked" : "unchecked"}
+                    onPress={() => setSortBy("Title")}
+                    color={"#7fb7f2"}
+                    uncheckedColor={"lightgray"}
+                  />
+                  <RadioButton.Item
+                    label={"Author"}
+                    value="Author"
+                    status={sortBy === "Author" ? "checked" : "unchecked"}
+                    onPress={() => setSortBy("Author")}
+                    color={"#7fb7f2"}
+                    uncheckedColor={"lightgray"}
+                  />
+                  <RadioButton.Item
+                    label={"Language"}
+                    value="Language"
+                    status={sortBy === "Language" ? "checked" : "unchecked"}
+                    onPress={() => setSortBy("Language")}
+                    color={"#7fb7f2"}
+                    uncheckedColor={"lightgray"}
+                  />
+                  <RadioButton.Item
+                    label={"Year"}
+                    value="Year"
+                    status={sortBy === "Year" ? "checked" : "unchecked"}
+                    onPress={() => setSortBy("Year")}
+                    color={"#7fb7f2"}
+                    uncheckedColor={"lightgray"}
+                  />
+                  <RadioButton.Item
+                    label={"Pages"}
+                    value="Pages"
+                    status={sortBy === "Pages" ? "checked" : "unchecked"}
+                    onPress={() => setSortBy("Pages")}
+                    color={"#7fb7f2"}
+                    uncheckedColor={"lightgray"}
+                  />
+                </Dialog.Content>
+              </Dialog>
+            </Portal>
             <Button
               mode="contained"
               color="#006fe6"
@@ -273,7 +358,7 @@ export default function MainPage({ navigation }) {
             onPress={backToTop}
           />
         )}
-      </>
+      </Provider>
     </DismissKeyboard>
   );
 }

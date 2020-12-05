@@ -24,6 +24,7 @@ export const searchWithIndex = async (id) => {
   //link to image and file to download the book
   book.image = `http://gen.lib.rus.ec/covers/${book.coverurl}`;
   book.download = `http://library.lol/main/${book.md5}`;
+  book.totalBytes = book.filesize;
 
   //displaying filesize in MB and KB
   if (book.filesize % 1048576 > 0) {

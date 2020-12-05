@@ -17,6 +17,8 @@ import {
   Provider,
   Snackbar,
   ProgressBar,
+  ActivityIndicator,
+  HelperText,
 } from "react-native-paper";
 import { getDLink } from "../../helpers";
 import * as FileSystem from "expo-file-system";
@@ -49,6 +51,7 @@ export default function DisplayOneBook({ route, navigation }) {
       await FileSystem.makeDirectoryAsync(bookDir);
     }
   }
+  //console.log("progress: ", downloadProgress);
 
   const downloadFile = async () => {
     console.log("downloading book..");
@@ -75,15 +78,27 @@ export default function DisplayOneBook({ route, navigation }) {
         }
 
         await ensureDirExists();
-        //using expo filesystem to download files
-        var file = await FileSystem.downloadAsync(
+
+        //callback to write download progress
+        const callback = (downloadProgres) => {
+          const progress =
+            downloadProgres.totalBytesWritten / oneBook.totalBytes;
+          setDownloadProgress(progress);
+          //console.log("progress is: ", downloadProgress);
+        };
+
+        //creates resumable downloads(able to stop and resume download)
+        //need to implement pause and resume download
+        const downloadResumable = FileSystem.createDownloadResumable(
           downloadURL,
-          bookDir + oneBook.title + "." + oneBook.extension
+          bookDir + oneBook.title + "." + oneBook.extension,
+          {},
+          callback
         );
 
-        //console.log("FILE: ", file.uri);
+        const { uri } = await downloadResumable.downloadAsync();
 
-        oneBook.file = file.uri;
+        oneBook.file = uri;
 
         //after the book is downloaded insert it into database
         let addBook = await insertValue(oneBook);
@@ -201,10 +216,29 @@ export default function DisplayOneBook({ route, navigation }) {
                   style={styles.fab}
                   onPress={downloadFile}
                 />
-                {/* <ProgressBar
+                <HelperText
+                  style={{ marginTop: 15 }}
+                  visible={downloadProgress}
+                >
+                  Downloading progress:
+                </HelperText>
+                <ProgressBar
+                  visible={downloadProgress}
                   progress={downloadProgress}
+                  color={"#7fb7f2"}
+                  style={{
+                    margin: 15,
+                    marginTop: 5,
+                    padding: 4,
+                    width: 250,
+                    borderRadius: 10,
+                  }}
+                />
+                <ActivityIndicator
+                  animating={disabledButton && downloadProgress !== 1}
                   style={{ margin: 10 }}
-                /> */}
+                  color={"red"}
+                />
               </>
             )}
             {showDescription && <View style={{ height: 100 }} />}
@@ -214,14 +248,14 @@ export default function DisplayOneBook({ route, navigation }) {
           <Snackbar
             visible={downloadingSnackbar}
             onDismiss={() => setDownloadingSnackbar(false)}
-            duration={10000}
+            duration={3000}
             style={{
               position: "absolute",
               bottom: 0,
               backgroundColor: "#000000CC",
             }}
           >
-            Downloading book..
+            Starting download..
           </Snackbar>
           <Snackbar
             visible={finishedSnackbar}

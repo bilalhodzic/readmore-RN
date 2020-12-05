@@ -11,7 +11,7 @@ export const searchBooks = async (options) => {
   const page = options.page || 1;
 
   //Order by: ID, Title, Publisher, Year, Pages, Language, Size, Extension
-  const sort = options.sort || "def";
+  const sort = options.sort.toLowerCase() || "def";
 
   //ASC or DESC
   const sortMode = options.sortMode || "ASC";
