@@ -17,14 +17,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bilalhodzic.ReadMore"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "android": {
       "package": "com.bilalhodzic.ReadMore",
-      "versionCode":2
+      "versionCode": 2
     }
   }
 }
