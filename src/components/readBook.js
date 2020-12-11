@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import {
   Title,
   Card,
@@ -11,48 +11,44 @@ import {
   Snackbar,
   Button,
 } from "react-native-paper";
-import { WebView } from "react-native-webview";
-import PDFReader from "rn-pdf-reader-js";
+import Pdf from "react-native-pdf";
 
 export default function ReadBook({ route, navigation }) {
   const { oneBook } = route.params;
+  const source = { uri: oneBook.file };
+  console.log(oneBook);
+  const numberOfPage = oneBook.pages;
 
   return (
     <View style={styles.container}>
-      <PDFReader
-        source={{ uri: oneBook.file, headers: { key: "string" } }}
-        withPinchZoom={true}
-        style={{ width: "100%", backgroundColor: "red" }}
-        customStyle={{
-          readerContainerNumbers: {
-            backgroundColor: "#fff",
-            padding: 0,
-          },
-          readerContainerZoomContainer: {
-            borderRadius: 30,
-            backgroundColor: "#00000099",
-          },
-          readerContainerNumbersContent: {
-            marginTop: 10,
-            backgroundColor: "#00000099",
-          },
-          readerContainerDocument: {
-            backgroundColor: "#fff",
-            //zoom: "130%",
-            transform: "scale(1.3)",
-            width: "100%",
-          },
-          readerContainerNavigate: {
-            backgroundColor: "#fff",
-          },
-          readerContainerNavigateArrow: {
-            //border: "2px solid red",
-            borderRadius: 10,
-            fontSize: 30,
-            color: "white",
-            backgroundColor: "#00000099",
-          },
+      <Pdf
+        ref={(pdf) => {
+          pdf = pdf;
+          //pdf.setPage(3);
         }}
+        source={source}
+        //horizontal={true}
+        //fitWidth={true}
+        //spacing={10}
+        //enableAntialiasing={true}
+        //singlePage={true}
+        //enablePaging={true}
+        // onPageSingleTap={(page) => {
+        //   console.log(page);
+        // }}
+        onLoadComplete={(numberOfPage, filePath) => {
+          console.log(`number of pages: ${numberOfPage}`);
+        }}
+        onPageChanged={(page, numberOfPage) => {
+          console.log(`current page: ${page}`);
+        }}
+        onError={(error) => {
+          console.log(error);
+        }}
+        onPressLink={(uri) => {
+          console.log(`Link presse: ${uri}`);
+        }}
+        style={styles.pdf}
       />
     </View>
   );
@@ -63,5 +59,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     //justifyContent: "flex-start",
+  },
+  pdf: {
+    flex: 1,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
   },
 });

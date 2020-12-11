@@ -43,6 +43,13 @@ export default function DisplayOneBook({ route, navigation }) {
   );
 
   const { oneBook, pathname } = route.params;
+  let title2 = oneBook.title.split(" ");
+  let title3 = "";
+  title2.forEach((element) => {
+    if (title3 === "") {
+      title3 += element;
+    } else title3 += "-" + element;
+  });
 
   async function ensureDirExists() {
     const dirInfo = await FileSystem.getInfoAsync(bookDir);
@@ -91,7 +98,7 @@ export default function DisplayOneBook({ route, navigation }) {
         //need to implement pause and resume download
         const downloadResumable = FileSystem.createDownloadResumable(
           downloadURL,
-          bookDir + oneBook.title + "." + oneBook.extension,
+          bookDir + title3 + "." + oneBook.extension,
           {},
           callback
         );
