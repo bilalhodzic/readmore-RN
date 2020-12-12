@@ -46,7 +46,6 @@ export default function DisplayBooks(prop) {
 
   //if pressed on start reading-- load read book component
   const readBook = (book) => {
-    console.log("read book...");
     prop.navigation.navigate(prop.pathname, {
       screen: "readBook",
       params: {

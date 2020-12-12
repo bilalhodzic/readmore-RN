@@ -93,3 +93,22 @@ export async function deleteValue(id) {
     });
   });
 }
+export async function updateBookPage(id, page) {
+  let sql = "update books set pageRead = (?) where id = (?)";
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        sql,
+        [page, id],
+        (_) => {
+          console.log("book page updated to: ", page);
+          resolve(true);
+        },
+        (err) => {
+          console.log("error ocured");
+          reject(err);
+        }
+      );
+    });
+  });
+}

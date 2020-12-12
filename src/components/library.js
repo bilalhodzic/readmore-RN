@@ -1,18 +1,19 @@
 import React from "react";
 import { StyleSheet, ScrollView, View, RefreshControl } from "react-native";
-import { Button, FAB } from "react-native-paper";
-import { insertValue, getAllValues, deleteValue } from "../../storage";
-import * as SQLite from "expo-sqlite";
+import { FAB } from "react-native-paper";
+import { getAllValues } from "../../storage";
 import DisplayBooks from "./displayBooks";
 
 export default function Library({ navigation }) {
   const [libraryBooks, setLibraryBooks] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshed, setRefreshed] = React.useState(false);
+  const scrollRef = React.useRef(null);
 
   //pull down to refresh library
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-
+    setRefreshed(true);
     (async function () {
       try {
         let books = await getAllValues();
@@ -24,18 +25,17 @@ export default function Library({ navigation }) {
     })();
   });
 
-  const scrollRef = React.useRef(null);
+  //when the library component is focused(active)
+  // refresh it but only once-- to update new values from database
+  const listen = navigation.addListener("focus", () => {
+    if (refreshed === false) {
+      onRefresh();
+    }
+  });
 
   //On loading the component get all the books from database
   React.useEffect(() => {
-    (async function () {
-      try {
-        let books = await getAllValues();
-        setLibraryBooks(books);
-      } catch (error) {
-        console.log(error);
-      }
-    })();
+    onRefresh();
   }, []);
 
   return (
