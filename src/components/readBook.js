@@ -1,34 +1,15 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  BackHandler,
-  AppState,
-  ScrollView,
-} from "react-native";
-import {
-  Title,
-  Card,
-  Subheading,
-  FAB,
-  Modal,
-  Portal,
-  Provider,
-  Snackbar,
-  Button,
-  Caption,
-  IconButton,
-} from "react-native-paper";
+import { View, StyleSheet, Dimensions } from "react-native";
+import { Caption, IconButton } from "react-native-paper";
 import Pdf from "react-native-pdf";
 import { updateBookPage } from "../../storage";
 
-export default function ReadBook({ route, navigation }) {
+export default function ReadBook({ route }) {
   const { oneBook } = route.params;
   const [currentPage, setCurrentPage] = React.useState(oneBook.pageRead);
   const [pdfLoaded, setPdfLoaded] = React.useState(false);
 
-  const [scale, setScale] = React.useState(1.0);
+  const [scale, setScale] = React.useState(1.15);
   const totalPages = oneBook.pages;
   const source = { uri: oneBook.file, cache: true, expiration: 0 };
 
@@ -45,16 +26,12 @@ export default function ReadBook({ route, navigation }) {
     setCurrentPage(prevPage);
     pdfRef.setPage(prevPage);
   };
-  const zoomIn = () => {
-    let sc = scale * 1.2;
-    setScale(sc);
+
+  React.useEffect(() => {
+    //useEffect hook when the pdf is loaded-only once
+    //to set the initial page
     pdfRef.setPage(currentPage);
-  };
-  const zoomOut = () => {
-    let sc = scale > 1 ? scale / 1.2 : 1;
-    setScale(sc);
-    pdfRef.setPage(currentPage);
-  };
+  }, [pdfLoaded]);
 
   React.useEffect(() => {
     //updating book page on every pageChanged
@@ -84,8 +61,6 @@ export default function ReadBook({ route, navigation }) {
           pdfRef = pdf;
         }}
         horizontal={true}
-        page={currentPage}
-        spacing={0}
         //singlePage={true}
         source={source}
         scale={scale}

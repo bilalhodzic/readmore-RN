@@ -21,14 +21,10 @@ import {
   HelperText,
 } from "react-native-paper";
 import { getDLink } from "../../helpers";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
+import RNFetchBlob from "rn-fetch-blob";
 import HTML from "react-native-render-html";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { insertValue, getValueById } from "../../storage";
-import { downloadFile } from "../../helpers";
-
-const bookDir = FileSystem.documentDirectory + "books/";
 
 export default function DisplayOneBook({ route, navigation }) {
   const [showDescription, setShowDescription] = React.useState(false);
@@ -43,22 +39,20 @@ export default function DisplayOneBook({ route, navigation }) {
   );
 
   const { oneBook, pathname } = route.params;
-  let title2 = oneBook.title.split(" ");
-  let title3 = "";
-  title2.forEach((element) => {
-    if (title3 === "") {
-      title3 += element;
-    } else title3 += "-" + element;
-  });
 
-  async function ensureDirExists() {
-    const dirInfo = await FileSystem.getInfoAsync(bookDir);
-    if (!dirInfo.exists) {
-      console.log("Books direcoty doesn't exist, creating..");
-      await FileSystem.makeDirectoryAsync(bookDir);
-    }
-  }
-  //console.log("progress: ", downloadProgress);
+  // async function ensureDirExists() {
+  //   const dirInfo = await FileSystem.getInfoAsync(bookDir);
+  //   if (!dirInfo.exists) {
+  //     console.log("Books direcoty doesn't exist, creating..");
+  //     await FileSystem.makeDirectoryAsync(bookDir);
+  //   }
+  // }
+
+  React.useEffect(() => {
+    return () => {
+      console.log("Unmounting");
+    };
+  }, []);
 
   const downloadFile = async () => {
     console.log("downloading book..");
@@ -84,35 +78,39 @@ export default function DisplayOneBook({ route, navigation }) {
           return console.log("book already exist!");
         }
 
-        await ensureDirExists();
+        //await ensureDirExists();
 
-        //callback to write download progress
-        const callback = (downloadProgres) => {
-          const progress =
-            downloadProgres.totalBytesWritten / oneBook.totalBytes;
-          setDownloadProgress(progress);
-          //console.log("progress is: ", downloadProgress);
+        let validTitle = "";
+        [...oneBook.title].forEach((element) => {
+          if (element === ":") {
+            validTitle += "";
+          } else {
+            validTitle += element;
+          }
+        });
+        //console.log(validTitle);
+
+        let dirs = RNFetchBlob.fs.dirs;
+        let options = {
+          path: dirs.DocumentDir + "/" + validTitle + "." + oneBook.extension,
         };
+        let file = await RNFetchBlob.config(options)
+          .fetch("GET", downloadURL)
+          .progress((received, total) => {
+            setDownloadProgress(received / total);
+          });
+        console.log("File saved To: ", file.path());
 
-        //creates resumable downloads(able to stop and resume download)
-        //need to implement pause and resume download
-        const downloadResumable = FileSystem.createDownloadResumable(
-          downloadURL,
-          bookDir + title3 + "." + oneBook.extension,
-          {},
-          callback
-        );
-
-        const { uri } = await downloadResumable.downloadAsync();
-
-        oneBook.file = uri;
+        oneBook.file = file.path();
 
         //after the book is downloaded insert it into database
         let addBook = await insertValue(oneBook);
+
         //insert will return true if everything is okay
         if (addBook === true) {
           setDownloadingSnackbar(false);
           setFinishedSnackbar(true);
+          setDisabledButton(false);
         }
       } catch (error) {
         setDownloadingSnackbar(false);
@@ -217,7 +215,7 @@ export default function DisplayOneBook({ route, navigation }) {
                 <FAB
                   label="Download now"
                   icon="download"
-                  color="white"
+                  color={disabledButton ? "lightgrey" : "white"}
                   disabled={disabledButton}
                   uppercase={false}
                   style={styles.fab}
@@ -232,17 +230,17 @@ export default function DisplayOneBook({ route, navigation }) {
                 <ProgressBar
                   visible={downloadProgress}
                   progress={downloadProgress}
-                  color={"#7fb7f2"}
+                  color={"royalblue"}
                   style={{
                     margin: 15,
                     marginTop: 5,
-                    padding: 4,
+                    height: 10,
                     width: 250,
-                    borderRadius: 10,
+                    borderRadius: 5,
                   }}
                 />
                 <ActivityIndicator
-                  animating={disabledButton && downloadProgress !== 1}
+                  animating={disabledButton}
                   style={{ margin: 10 }}
                   color={"red"}
                 />

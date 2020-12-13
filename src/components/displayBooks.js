@@ -17,10 +17,14 @@ import {
   Provider,
 } from "react-native-paper";
 import { deleteValue } from "../../storage";
-import * as FileSystem from "expo-file-system";
+import RNFetchBlob from "rn-fetch-blob";
 
 export default function DisplayBooks(prop) {
   const [visibleDialog, setVisibleDialog] = React.useState(false);
+
+  //making dinamic progress bar
+  const normalise = (value) => ((value - 1) * 1) / (prop.book.pages - 1);
+  var readProgress = normalise(prop.book.pageRead);
 
   //console.log("prop is: ", prop);
 
@@ -37,7 +41,7 @@ export default function DisplayBooks(prop) {
             pathname: prop.pathname,
           },
         });
-        console.log("oneBook is ready to display");
+        //console.log("oneBook is ready to display");
       })
       .catch((err) => {
         return console.log(err);
@@ -59,7 +63,7 @@ export default function DisplayBooks(prop) {
 
     (async function () {
       try {
-        await FileSystem.deleteAsync(book.file);
+        await RNFetchBlob.fs.unlink(book.file);
         let deletedBook = await deleteValue(book.id);
         if (deletedBook === true) {
           prop.refreshLibrary();
@@ -92,7 +96,14 @@ export default function DisplayBooks(prop) {
           {prop.pathname === "library" && (
             <>
               <ProgressBar
-                progress={0.3}
+                style={{
+                  alignSelf: "center",
+                  height: 7,
+                  borderRadius: 5,
+                  width: "95%",
+                }}
+                color={"royalblue"}
+                progress={readProgress}
                 visible={prop.book.pageRead > 1}
               ></ProgressBar>
               <View style={styles.libContainer}>
@@ -117,6 +128,7 @@ export default function DisplayBooks(prop) {
                     ? "Continue reading"
                     : "Start reading"}
                 </Button>
+
                 <Portal>
                   <Dialog
                     visible={visibleDialog}
@@ -200,7 +212,6 @@ const styles = StyleSheet.create({
   libContainer: {
     padding: "1%",
     flexDirection: "row",
-    //height: 40,
     justifyContent: "space-evenly",
   },
 });
