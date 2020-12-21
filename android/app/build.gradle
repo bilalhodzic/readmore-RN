@@ -78,7 +78,9 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false
+    enableHermes: false,
+     //bundleInDebug: true,
+     //bundleInRelease:true
 ]
 
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
