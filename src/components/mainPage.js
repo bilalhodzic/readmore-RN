@@ -27,7 +27,6 @@ import {
   Subheading,
   Provider,
   RadioButton,
-  Surface,
 } from "react-native-paper";
 
 const theme = {
@@ -50,6 +49,7 @@ export default function MainPage({ navigation }) {
   var defaultErrorMsg = "No Error";
   var defaultQuerySearch = "";
   var defaultSortBy = "Title";
+  var searchOptions;
 
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
@@ -62,15 +62,18 @@ export default function MainPage({ navigation }) {
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
   const [noResults, setNoResults] = React.useState(false);
   const [sortBy, setSortBy] = React.useState("ID");
+  const [sortMode, setSortMode] = React.useState("ASC");
+
+  const [searchPage, setSearchPage] = React.useState(1);
 
   const scrollRef = React.useRef(null);
 
   //options to search within the libgen-api
-  var searchOptions = {
+  searchOptions = {
     query: searchQuery,
-    page: 1,
+    page: searchPage,
     sort: sortBy, //order by id, title, author..
-    sortMode: "ASC", //sort by asc or desc
+    sortMode: sortMode, //sort by asc or desc
     resNumber: 25, //Numberr of result per page (default 25)
   };
 
@@ -116,6 +119,7 @@ export default function MainPage({ navigation }) {
           setBooks([]);
           setNoResults(true);
           searchOptions.page = 1;
+          setSearchPage(1);
 
           return;
         }
@@ -131,6 +135,7 @@ export default function MainPage({ navigation }) {
         setErrorMessage(err.message);
         setErrorSnackbar(true);
         searchOptions.page = 1;
+        setSearchPage(1);
 
         return console.log("Error: ", err.message);
       });
@@ -160,7 +165,7 @@ export default function MainPage({ navigation }) {
           style={{ borderRadius: 20, margin: 15 }}
           onPress={() => {
             searchOptions.page -= 1;
-
+            setSearchPage(searchOptions.page);
             getBooks();
           }}
         >
@@ -175,6 +180,8 @@ export default function MainPage({ navigation }) {
           style={{ borderRadius: 20, margin: 15 }}
           onPress={() => {
             searchOptions.page += 1;
+            setSearchPage(searchOptions.page);
+
             getBooks();
           }}
         >
@@ -207,22 +214,45 @@ export default function MainPage({ navigation }) {
             <HelperText type="error" visible={searchError}>
               Search text has to be at least 4 characters!
             </HelperText>
-
-            <Subheading
-              onPress={() => {
-                setVisibleDialog(true);
-              }}
+            <View
               style={{
-                paddingBottom: 4,
-                paddingRight: 20,
-                paddingLeft: 20,
-                marginBottom: 6,
-                borderBottomColor: "lightgray",
-                borderBottomWidth: 1,
+                display: "flex",
+                flexDirection: "row",
               }}
             >
-              Sort by: "{sortBy}"
-            </Subheading>
+              <Subheading
+                onPress={() => {
+                  setVisibleDialog(true);
+                }}
+                style={{
+                  paddingBottom: 4,
+                  paddingRight: 20,
+                  paddingLeft: 20,
+                  marginBottom: 6,
+                  borderBottomColor: "lightgray",
+                  borderBottomWidth: 1,
+                }}
+              >
+                Sort by: "{sortBy}"
+              </Subheading>
+              <Subheading
+                onPress={() => {
+                  setSortMode(sortMode === "ASC" ? "DESC" : "ASC");
+                }}
+                style={{
+                  paddingBottom: 4,
+                  paddingRight: 10,
+                  paddingLeft: 10,
+                  marginBottom: 6,
+                  borderBottomColor: "lightgray",
+                  borderBottomWidth: 1,
+                  //fontSize: 12,
+                }}
+              >
+                Order by: "{sortMode}"
+              </Subheading>
+            </View>
+
             <Portal>
               <Dialog
                 visible={visibleDialog}
