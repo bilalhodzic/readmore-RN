@@ -6,6 +6,7 @@ export const searchBooks = async (options) => {
   if (!options.query || options.query.length < 3) {
     throw new Error("Search query is bad. Try again.");
   }
+  // throw new Error("http not working on android");
 
   //default number page is 1
   const page = options.page || 1;
@@ -24,6 +25,8 @@ export const searchBooks = async (options) => {
 
   //finalURL to scrape the data
   const siteURL = `http://gen.lib.rus.ec/search.php?req=${finalquery}&open=0&res=${resNumber}&view=detailed&phrase=1&column=def&sort=${sort}&sortmode=${sortMode}&page=${page}`;
+
+  console.log("SiteURL is: ", siteURL);
 
   //using axios to get data from website
   const response = await axios.get(siteURL);

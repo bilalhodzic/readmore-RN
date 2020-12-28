@@ -28,6 +28,7 @@ import {
   Provider,
   RadioButton,
 } from "react-native-paper";
+import { useDarkMode } from "react-native-dynamic";
 
 const theme = {
   ...DefaultTheme,
@@ -50,7 +51,6 @@ export default function MainPage({ navigation }) {
   var defaultQuerySearch = "";
   var defaultSortBy = "Title";
   var searchOptions;
-
   const [searchError, setSearchError] = React.useState(false);
   const [activityLoad, setActivityLoad] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState(defaultQuerySearch);
@@ -63,9 +63,12 @@ export default function MainPage({ navigation }) {
   const [noResults, setNoResults] = React.useState(false);
   const [sortBy, setSortBy] = React.useState("ID");
   const [sortMode, setSortMode] = React.useState("ASC");
-
   const [searchPage, setSearchPage] = React.useState(1);
 
+  const isDarkMode = useDarkMode();
+  React.useEffect(() => {
+    console.log(isDarkMode);
+  }, [isDarkMode]);
   const scrollRef = React.useRef(null);
 
   //options to search within the libgen-api
@@ -194,11 +197,23 @@ export default function MainPage({ navigation }) {
   return (
     <DismissKeyboard>
       <Provider>
-        <ScrollView ref={scrollRef} contentContainerStyle={styles.container}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={{
+            backgroundColor: isDarkMode ? "#000000e6" : "white",
+            flexGrow: 1,
+            fontFamily: "arial",
+            padding: "2%",
+          }}
+        >
           <SafeAreaView style={{ alignItems: "center" }}>
             <Image
               style={{ width: 100, height: 100 }}
-              source={require("../../assets/icon.png")}
+              source={
+                isDarkMode
+                  ? require("../../assets/icon_dark.png")
+                  : require("../../assets/icon.png")
+              }
             />
             <Headline style={styles.heading}>
               Search millions of{"\n"} books online
@@ -313,7 +328,7 @@ export default function MainPage({ navigation }) {
             </Portal>
             <Button
               mode="contained"
-              color="#006fe6"
+              color="#006fe6b8"
               icon="book-search"
               contentStyle={{ height: 40 }}
               labelStyle={{
@@ -396,7 +411,7 @@ export default function MainPage({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#fff",
+    //backgroundColor: isDarkMode ? "black" : "white",
     fontFamily: "arial",
     padding: "2%",
   },

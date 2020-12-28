@@ -1,14 +1,16 @@
 import React from "react";
 import { StyleSheet, ScrollView, View, RefreshControl } from "react-native";
-import { FAB } from "react-native-paper";
+import { FAB, Headline, Caption } from "react-native-paper";
 import { getAllValues } from "../../storage";
 import DisplayBooks from "./displayBooks";
+import { useDarkMode } from "react-native-dynamic";
 
 export default function Library({ navigation }) {
   const [libraryBooks, setLibraryBooks] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const [refreshed, setRefreshed] = React.useState(false);
   const scrollRef = React.useRef(null);
+  const isDarkMode = useDarkMode();
 
   //pull down to refresh library
   const onRefresh = React.useCallback(() => {
@@ -42,11 +44,38 @@ export default function Library({ navigation }) {
     <>
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={styles.container}
+        contentContainerStyle={{
+          flexGrow: 1,
+          backgroundColor: isDarkMode ? "#000000e6" : "#fff",
+          padding: "2%",
+        }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {console.log(libraryBooks.length)}
+        {libraryBooks.length === 0 && (
+          <>
+            <Headline
+              style={{
+                textAlign: "center",
+                marginTop: "30%",
+                color: isDarkMode ? "white" : "black",
+              }}
+            >
+              No books in the library!
+            </Headline>
+            <Caption
+              style={{
+                textAlign: "center",
+                // marginTop: "30%",
+                color: isDarkMode ? "white" : "black",
+              }}
+            >
+              Please download book first
+            </Caption>
+          </>
+        )}
         <View style={{ alignItems: "center" }}>
           {libraryBooks &&
             libraryBooks.map((book, index) => (

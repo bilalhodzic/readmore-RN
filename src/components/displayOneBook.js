@@ -19,12 +19,14 @@ import {
   ProgressBar,
   ActivityIndicator,
   HelperText,
+  Caption,
 } from "react-native-paper";
 import { getDLink } from "../../helpers";
 import RNFetchBlob from "rn-fetch-blob";
 import HTML from "react-native-render-html";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { insertValue, getValueById } from "../../storage";
+import { useDarkMode } from "react-native-dynamic";
 
 export default function DisplayOneBook({ route, navigation }) {
   const [showDescription, setShowDescription] = React.useState(false);
@@ -38,6 +40,7 @@ export default function DisplayOneBook({ route, navigation }) {
     "File couldn't be downloaded :( "
   );
 
+  const isDarkMode = useDarkMode();
   const { oneBook, pathname } = route.params;
 
   // async function ensureDirExists() {
@@ -126,7 +129,15 @@ export default function DisplayOneBook({ route, navigation }) {
   return (
     <>
       <Provider>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            backgroundColor: isDarkMode ? "#000000e6" : "#fff",
+            padding: "2%",
+            paddingTop: "15%",
+            justifyContent: "flex-start",
+          }}
+        >
           <View style={{ alignItems: "center" }}>
             <Title style={styles.text}>{oneBook.title}</Title>
             <Subheading style={styles.text}>
@@ -202,11 +213,26 @@ export default function DisplayOneBook({ route, navigation }) {
             />
             {showDescription && (
               <Card elevation={3} style={{ margin: 10, flexBasis: 1 }}>
-                <Card.Content>
-                  <HTML
-                    tagsStyles={{ p: { textAlign: "center" } }}
-                    html={oneBook.descr || "No description"}
-                  />
+                <Card.Content
+                  style={{
+                    color: isDarkMode ? "white" : "black",
+                  }}
+                >
+                  {oneBook.descr.includes("<P>") ? (
+                    <HTML
+                      tagsStyles={{
+                        p: {
+                          textAlign: "center",
+                          color: isDarkMode ? "white" : "black",
+                        },
+                      }}
+                      html={oneBook.descr || "No description"}
+                    />
+                  ) : (
+                    <Caption style={{ textAlign: "center" }}>
+                      {oneBook.descr}
+                    </Caption>
+                  )}
                 </Card.Content>
               </Card>
             )}
@@ -257,7 +283,7 @@ export default function DisplayOneBook({ route, navigation }) {
             style={{
               position: "absolute",
               bottom: 0,
-              backgroundColor: "#000000CC",
+              backgroundColor: isDarkMode ? "white" : "#000000CC",
             }}
           >
             Starting download..

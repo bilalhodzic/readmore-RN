@@ -79,7 +79,7 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     enableHermes: false,
-     bundleInDebug: true,
+     //bundleInDebug: true,
      //bundleInRelease:true
 ]
 
@@ -136,8 +136,8 @@ android {
         applicationId 'com.bilalhodzic.ReadMore'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "1.1.2"
+        versionCode 7
+        versionName "1.1.4"
     }
 
     packagingOptions {

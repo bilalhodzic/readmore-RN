@@ -3,13 +3,15 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import { Caption, IconButton } from "react-native-paper";
 import Pdf from "react-native-pdf";
 import { updateBookPage } from "../../storage";
+import { useDarkMode } from "react-native-dynamic";
 
 export default function ReadBook({ route }) {
   const { oneBook } = route.params;
   const [currentPage, setCurrentPage] = React.useState(oneBook.pageRead);
   const [pdfLoaded, setPdfLoaded] = React.useState(false);
-
   const [scale, setScale] = React.useState(1.15);
+
+  const isDarkMode = useDarkMode();
   const totalPages = oneBook.pages;
   const source = { uri: oneBook.file, cache: true, expiration: 0 };
 
@@ -39,7 +41,13 @@ export default function ReadBook({ route }) {
   }, [currentPage]);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: isDarkMode ? "#fff" : "#000000e6",
+        justifyContent: "flex-start",
+      }}
+    >
       <Caption
         style={{
           backgroundColor: "#00000080",
@@ -63,7 +71,6 @@ export default function ReadBook({ route }) {
         horizontal={true}
         //singlePage={true}
         source={source}
-        scale={scale}
         fitPolicy={0}
         enableAnnotationRendering={true}
         enablePaging={true}
@@ -82,14 +89,18 @@ export default function ReadBook({ route }) {
         onPressLink={(uri) => {
           console.log("Link pressed: ", uri);
         }}
-        onScaleChanged={(scale) => {
-          setScale(scale);
-          //console.log("scale: ", scale);
+        onScaleChanged={(scale1) => {
+          setScale(scale1 >= 1.0 ? scale1 : 1.0);
         }}
         onError={(error) => {
           console.log(error);
         }}
-        style={styles.pdf}
+        style={{
+          flex: 1,
+          width: Dimensions.get("window").width,
+          height: Dimensions.get("window").height,
+          backgroundColor: isDarkMode ? "#000000e6" : "white",
+        }}
       />
       {/* <View style={styles.zoom}>
         <IconButton icon="plus" color={"white"} onPress={zoomIn} />
@@ -100,6 +111,7 @@ export default function ReadBook({ route }) {
         style={{
           flexDirection: "row",
           justifyContent: "space-around",
+          backgroundColor: isDarkMode ? "#000000e6" : "white",
         }}
       >
         <IconButton
@@ -107,14 +119,14 @@ export default function ReadBook({ route }) {
           onPress={prevPage}
           size={30}
           style={{ margin: 0 }}
-          color={"#00000099"}
+          color={isDarkMode ? "white" : "000000e6"}
         />
         <IconButton
           icon="arrow-right"
           onPress={nextPage}
           style={{ margin: 0 }}
           size={30}
-          color={"#00000099"}
+          color={isDarkMode ? "white" : "000000e6"}
         />
       </View>
     </View>
@@ -127,11 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "flex-start",
   },
-  pdf: {
-    flex: 1,
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
+
   zoom: {
     backgroundColor: "#00000070",
     borderRadius: 20,
