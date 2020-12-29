@@ -80,7 +80,12 @@ export default function DisplayBooks(prop) {
         <Card elevation={2} onPress={() => loadOneBook(prop.book.id)}>
           <Image style={styles.bookImage} source={{ uri: prop.book.image }} />
           <Card.Content style={styles.bookDescr}>
-            <Paragraph style={{ textAlign: "center" }}>
+            <Paragraph
+              numberOfLines={3}
+              style={{
+                textAlign: "center",
+              }}
+            >
               {prop.book.title}
             </Paragraph>
             <Caption style={{ textAlign: "center" }}>

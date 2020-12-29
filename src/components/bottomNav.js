@@ -18,7 +18,7 @@ export default function BottomNav() {
 
   const screenOptionsStyles = {
     headerStyle: {
-      backgroundColor: isDarkMode ? "#000000cc" : "#0063ccB3",
+      backgroundColor: isDarkMode ? "#000000e6" : "#0063ccB3",
       height: 80,
       borderBottomWidth: 3,
       borderRadius: isDarkMode ? 0 : 3,
@@ -58,7 +58,7 @@ export default function BottomNav() {
       <Tab.Navigator
         initialRouteName="mainPage"
         barStyle={{
-          backgroundColor: isDarkMode ? "#00000099" : "#0063ccCC",
+          backgroundColor: isDarkMode ? "#000000e6" : "#0063cccc",
           borderTopWidth: 1,
           borderTopColor: isDarkMode ? "#00000099" : "lightgray",
         }}

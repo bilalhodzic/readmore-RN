@@ -246,25 +246,15 @@ export default function MainPage({ navigation }) {
                   marginBottom: 6,
                   borderBottomColor: "lightgray",
                   borderBottomWidth: 1,
+                  alignItems: "center",
                 }}
               >
-                Sort by: "{sortBy}"
-              </Subheading>
-              <Subheading
-                onPress={() => {
-                  setSortMode(sortMode === "ASC" ? "DESC" : "ASC");
-                }}
-                style={{
-                  paddingBottom: 4,
-                  paddingRight: 10,
-                  paddingLeft: 10,
-                  marginBottom: 6,
-                  borderBottomColor: "lightgray",
-                  borderBottomWidth: 1,
-                  //fontSize: 12,
-                }}
-              >
-                Order by: "{sortMode}"
+                Search options{"  "}
+                <MaterialCommunityIcons
+                  name="settings"
+                  size={17}
+                  color={"#7fb7f2"}
+                />
               </Subheading>
             </View>
 
@@ -273,57 +263,106 @@ export default function MainPage({ navigation }) {
                 visible={visibleDialog}
                 onDismiss={() => setVisibleDialog(false)}
               >
-                <Dialog.Title>Sort by:</Dialog.Title>
-                <Dialog.Content>
-                  <RadioButton.Item
-                    label={"ID (default)"}
-                    value="ID"
-                    status={sortBy === "ID" ? "checked" : "unchecked"}
-                    onPress={() => setSortBy("ID")}
-                    color={"#7fb7f2"}
-                    uncheckedColor={"lightgray"}
-                  />
-                  <RadioButton.Item
-                    label={"Title"}
-                    value="Title"
-                    status={sortBy === "Title" ? "checked" : "unchecked"}
-                    onPress={() => setSortBy("Title")}
-                    color={"#7fb7f2"}
-                    uncheckedColor={"lightgray"}
-                  />
-                  <RadioButton.Item
-                    label={"Author"}
-                    value="Author"
-                    status={sortBy === "Author" ? "checked" : "unchecked"}
-                    onPress={() => setSortBy("Author")}
-                    color={"#7fb7f2"}
-                    uncheckedColor={"lightgray"}
-                  />
-                  <RadioButton.Item
-                    label={"Language"}
-                    value="Language"
-                    status={sortBy === "Language" ? "checked" : "unchecked"}
-                    onPress={() => setSortBy("Language")}
-                    color={"#7fb7f2"}
-                    uncheckedColor={"lightgray"}
-                  />
-                  <RadioButton.Item
-                    label={"Year"}
-                    value="Year"
-                    status={sortBy === "Year" ? "checked" : "unchecked"}
-                    onPress={() => setSortBy("Year")}
-                    color={"#7fb7f2"}
-                    uncheckedColor={"lightgray"}
-                  />
-                  <RadioButton.Item
-                    label={"Pages"}
-                    value="Pages"
-                    status={sortBy === "Pages" ? "checked" : "unchecked"}
-                    onPress={() => setSortBy("Pages")}
-                    color={"#7fb7f2"}
-                    uncheckedColor={"lightgray"}
-                  />
-                </Dialog.Content>
+                <Dialog.ScrollArea>
+                  <ScrollView>
+                    <Dialog.Title style={{ marginTop: 5, marginBottom: 0 }}>
+                      Sort by:
+                    </Dialog.Title>
+                    <Dialog.Content>
+                      <RadioButton.Item
+                        label={"ID (default)"}
+                        value="ID"
+                        status={sortBy === "ID" ? "checked" : "unchecked"}
+                        onPress={() => setSortBy("ID")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                      <RadioButton.Item
+                        label={"Title"}
+                        value="Title"
+                        status={sortBy === "Title" ? "checked" : "unchecked"}
+                        onPress={() => setSortBy("Title")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                      <RadioButton.Item
+                        label={"Author"}
+                        value="Author"
+                        status={sortBy === "Author" ? "checked" : "unchecked"}
+                        onPress={() => setSortBy("Author")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                      <RadioButton.Item
+                        label={"Language"}
+                        value="Language"
+                        status={sortBy === "Language" ? "checked" : "unchecked"}
+                        onPress={() => setSortBy("Language")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                      <RadioButton.Item
+                        label={"Year"}
+                        value="Year"
+                        status={sortBy === "Year" ? "checked" : "unchecked"}
+                        onPress={() => setSortBy("Year")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                      <RadioButton.Item
+                        label={"Pages"}
+                        value="Pages"
+                        status={sortBy === "Pages" ? "checked" : "unchecked"}
+                        onPress={() => setSortBy("Pages")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                    </Dialog.Content>
+                    <Dialog.Title style={{ marginTop: 0, marginBottom: 0 }}>
+                      Order by:
+                    </Dialog.Title>
+                    <Dialog.Content>
+                      <RadioButton.Item
+                        label={"ASC (default)"}
+                        value="ASC"
+                        status={sortMode === "ASC" ? "checked" : "unchecked"}
+                        onPress={() => setSortMode("ASC")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                      <RadioButton.Item
+                        label={"DESC"}
+                        value="DESC"
+                        status={sortMode === "DESC" ? "checked" : "unchecked"}
+                        onPress={() => setSortMode("DESC")}
+                        color={"#7fb7f2"}
+                        uncheckedColor={"lightgray"}
+                      />
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                      <Button
+                        color={"#006fe6b8"}
+                        onPress={() => {
+                          setSortBy("ID");
+                          setSortMode("ASC");
+                          setVisibleDialog(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+
+                      <Button
+                        color={"#006fe6b8"}
+                        onPress={() => {
+                          setVisibleDialog(false);
+                          getBooks();
+                        }}
+                      >
+                        Search
+                      </Button>
+                    </Dialog.Actions>
+                  </ScrollView>
+                </Dialog.ScrollArea>
               </Dialog>
             </Portal>
             <Button

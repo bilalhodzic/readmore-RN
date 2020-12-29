@@ -25,7 +25,12 @@
     },
     "android": {
       "package": "com.bilalhodzic.ReadMore",
-      "versionCode": 4
+      "versionCode": 4,
+      "adaptiveIcon":{
+        "backgroundColor":"#fff",
+        "foregroundImage":"./assets/icon.png",
+        "backgroundImage":"./assets/icon.png"
+      }
     }
   }
 }

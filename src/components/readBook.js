@@ -6,10 +6,11 @@ import { updateBookPage } from "../../storage";
 import { useDarkMode } from "react-native-dynamic";
 
 export default function ReadBook({ route }) {
+  const initialScale = 1.15;
   const { oneBook } = route.params;
   const [currentPage, setCurrentPage] = React.useState(oneBook.pageRead);
   const [pdfLoaded, setPdfLoaded] = React.useState(false);
-  const [scale, setScale] = React.useState(1.15);
+  const [scale, setScale] = React.useState(initialScale);
 
   const isDarkMode = useDarkMode();
   const totalPages = oneBook.pages;
@@ -70,6 +71,7 @@ export default function ReadBook({ route }) {
         }}
         horizontal={true}
         //singlePage={true}
+        scale={initialScale}
         source={source}
         fitPolicy={0}
         enableAnnotationRendering={true}
@@ -119,14 +121,14 @@ export default function ReadBook({ route }) {
           onPress={prevPage}
           size={30}
           style={{ margin: 0 }}
-          color={isDarkMode ? "white" : "000000e6"}
+          color={isDarkMode ? "white" : "#000000e6"}
         />
         <IconButton
           icon="arrow-right"
           onPress={nextPage}
           style={{ margin: 0 }}
           size={30}
-          color={isDarkMode ? "white" : "000000e6"}
+          color={isDarkMode ? "white" : "#000000e6"}
         />
       </View>
     </View>
