@@ -20,8 +20,10 @@ We are not holding any books on our servers, we are just redirecting already mad
    <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_1.png" width="150" alt="accessibility text">
    <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_2.png" width="150" alt="accessibility text">
  <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_3.png" width="150" alt="accessibility text">
- <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_4.png" width="150" alt="accessibility text">
  <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_5.png" width="150" alt="accessibility text">
+ <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_6.png" width="150" alt="accessibility text">
+ 
+ 
  
   </span> 
   
