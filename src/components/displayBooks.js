@@ -88,7 +88,7 @@ export default function DisplayBooks(prop) {
             >
               {prop.book.title}
             </Paragraph>
-            <Caption style={{ textAlign: "center" }}>
+            <Caption numberOfLines={2} style={{ textAlign: "center" }}>
               <MaterialCommunityIcons name="account-circle" color="#7fb7f2" />{" "}
               {prop.book.author}
             </Caption>
