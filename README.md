@@ -17,11 +17,13 @@ We are not holding any books on our servers, we are just redirecting already mad
 ## Screenshots
  
  <span>
-   <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_20201202-143734.png" width="150" alt="accessibility text">
-   <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_20201202-135937.png" width="150" alt="accessibility text">
- <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_20201202-135944.png" width="150" alt="accessibility text">
- <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_20201202-140042.png" width="150" alt="accessibility text">
- <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_20201202-140118.png" width="150" alt="accessibility text">
+   <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_1.png" width="150" alt="accessibility text">
+   <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_2.png" width="150" alt="accessibility text">
+ <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_3.png" width="150" alt="accessibility text">
+ <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_5.png" width="150" alt="accessibility text">
+ <img src="https://github.com/bilalhodzic/readmore-RN/blob/dev/Screenshots/Screenshot_6.png" width="150" alt="accessibility text">
+ 
+ 
  
   </span> 
   
