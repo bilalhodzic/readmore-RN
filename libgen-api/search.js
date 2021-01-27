@@ -47,7 +47,13 @@ export const searchBooks = async (options) => {
   }
 
   //search tagName 'font'-- index [2] is always  number of files
+
+  //there is one error on some devices
+  if ($("font")[2].children[0] === undefined) {
+    throw new Error("We ran into a problem. Try again!");
+  }
   let filesFound = $("font")[2].children[0].data;
+
   let numberFilesFound = filesFound.split(" ")[0];
 
   var books = [];
@@ -62,6 +68,8 @@ export const searchBooks = async (options) => {
     if ($("font:contains('ID')")[i + 1] === undefined) {
       break;
     }
+    let getYear = $("font:contains('Year')")[i + 1].parent.next.next
+      .children[0];
     let getID = $("font:contains('ID')")[i + 1].parent.next.next.children[0];
 
     //only td with attr colspan=2 has the title data
@@ -80,6 +88,7 @@ export const searchBooks = async (options) => {
 
       //need to check if there is number of pages
       pages: getPage !== undefined ? getPage.data : 0,
+      year: getYear !== undefined ? getYear.data : 0,
       extension: $("font:contains('Extension')")[i + 1].parent.next.next
         .children[0].data,
     });
@@ -119,15 +128,16 @@ export const searchBooks = async (options) => {
   }
 
   //return array of books
+  //console.log(books);
   return books;
 };
 
 //options example
 var options = {
-  query: "rhonda byrne",
+  query: "rich dad",
 
   //default 1
-  page: 2,
+  page: 1,
 
   //Order by: ID, Title, Publisher, Year, Pages, Language, Size, Extension
   sort: "def",

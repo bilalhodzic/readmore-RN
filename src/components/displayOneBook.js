@@ -33,6 +33,8 @@ export default function DisplayOneBook({ route, navigation }) {
   const [visibleImage, setVisibleImage] = React.useState(false);
   const [downloadingSnackbar, setDownloadingSnackbar] = React.useState(false);
   const [finishedSnackbar, setFinishedSnackbar] = React.useState(false);
+  const [downloadFinished, setDownloadFinished] = React.useState(false);
+
   const [errorSnackbar, setErrorSnackbar] = React.useState(false);
   const [downloadProgress, setDownloadProgress] = React.useState(0);
   const [disabledButton, setDisabledButton] = React.useState(false);
@@ -43,15 +45,26 @@ export default function DisplayOneBook({ route, navigation }) {
   const isDarkMode = useDarkMode();
   const { oneBook, pathname } = route.params;
 
-  // async function ensureDirExists() {
-  //   const dirInfo = await FileSystem.getInfoAsync(bookDir);
-  //   if (!dirInfo.exists) {
-  //     console.log("Books direcoty doesn't exist, creating..");
-  //     await FileSystem.makeDirectoryAsync(bookDir);
-  //   }
-  // }
-
   React.useEffect(() => {
+    getValueById(oneBook.id)
+      .then((book) => {
+        if (book !== undefined) {
+          setDisabledButton(true);
+          setDownloadFinished(true);
+        }
+        console.log(book);
+      })
+      .catch((err) => {
+        return console.log(err);
+      });
+    // if (bookExist !== undefined) {
+    //   setDownloadingSnackbar(false);
+
+    //   setErrorSnackbar(true);
+    //   setErrorMessage("Book already exist in library!");
+    //   setDisabledButton(true);
+    //   return console.log("book already exist!");
+    // }
     return () => {
       console.log("Unmounting");
     };
@@ -66,6 +79,7 @@ export default function DisplayOneBook({ route, navigation }) {
 
     //show to the user that downloading started
     setDownloadingSnackbar(true);
+    setDownloadFinished(false);
     setDisabledButton(true);
 
     (async function () {
@@ -114,6 +128,7 @@ export default function DisplayOneBook({ route, navigation }) {
           setDownloadingSnackbar(false);
           setFinishedSnackbar(true);
           setDisabledButton(false);
+          setDownloadFinished(true);
         }
       } catch (error) {
         setDownloadingSnackbar(false);
@@ -201,6 +216,11 @@ export default function DisplayOneBook({ route, navigation }) {
                   {"  "}
                   {oneBook.extension}
                 </Subheading>
+                <Subheading>
+                  <MaterialIcons name="language" size={15} color="#7fb7f2" />
+                  {"  "}
+                  {oneBook.language}
+                </Subheading>
               </View>
             </View>
             <FAB
@@ -226,11 +246,13 @@ export default function DisplayOneBook({ route, navigation }) {
                           color: isDarkMode ? "white" : "black",
                         },
                       }}
-                      html={oneBook.descr || "No description"}
+                      html={oneBook.descr || "No description available"}
                     />
                   ) : (
                     <Caption style={{ textAlign: "center" }}>
-                      {oneBook.descr}
+                      {oneBook.descr === ""
+                        ? "No description available"
+                        : oneBook.descr}
                     </Caption>
                   )}
                 </Card.Content>
@@ -253,8 +275,9 @@ export default function DisplayOneBook({ route, navigation }) {
                 >
                   Downloading progress:
                 </HelperText>
+
                 <ProgressBar
-                  visible={downloadProgress}
+                  visible={downloadProgress && !downloadFinished}
                   progress={downloadProgress}
                   color={"royalblue"}
                   style={{
@@ -265,8 +288,19 @@ export default function DisplayOneBook({ route, navigation }) {
                     borderRadius: 5,
                   }}
                 />
+                <HelperText
+                  style={{ color: "#52af52", fontSize: 15 }}
+                  visible={downloadFinished}
+                >
+                  Book available in your library! {"  "}
+                  <MaterialCommunityIcons
+                    name="check-bold"
+                    size={20}
+                    color="#52af52"
+                  />
+                </HelperText>
                 <ActivityIndicator
-                  animating={disabledButton}
+                  animating={disabledButton && !downloadFinished}
                   style={{ margin: 10 }}
                   color={"red"}
                 />

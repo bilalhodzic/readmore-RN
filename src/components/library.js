@@ -22,7 +22,7 @@ export default function Library({ navigation }) {
         setLibraryBooks(books);
         setRefreshing(false);
       } catch (error) {
-        console.log(error);
+        return console.log("Error: ", error);
       }
     })();
   });
@@ -53,7 +53,6 @@ export default function Library({ navigation }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {console.log(libraryBooks.length)}
         {libraryBooks.length === 0 && (
           <>
             <Headline

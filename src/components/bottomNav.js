@@ -1,15 +1,12 @@
 import * as React from "react";
 import MainPage from "./mainPage";
 import Library from "./library";
-import ReadBook from "./readBook";
 import DisplayOneBook from "./displayOneBook";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import readBook from "./readBook";
-import { LinearGradient } from "expo-linear-gradient";
 import { useDarkMode } from "react-native-dynamic";
-
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -45,7 +42,7 @@ export default function BottomNav() {
       <Stack.Navigator screenOptions={screenOptionsStyles}>
         <Stack.Screen
           name="myLibrary"
-          screenOptions={{ headerTitle: "Library" }}
+          options={{ headerTitle: "Library" }}
           component={Library}
         />
         <Stack.Screen name="oneBook" component={DisplayOneBook} />

@@ -1,16 +1,22 @@
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { Caption, IconButton } from "react-native-paper";
 import Pdf from "react-native-pdf";
 import { updateBookPage } from "../../storage";
 import { useDarkMode } from "react-native-dynamic";
+import Orientation from "react-native-orientation-locker";
 
-export default function ReadBook({ route }) {
-  const initialScale = 1.15;
+const WIN_WIDTH = Dimensions.get("window").width;
+const WIN_HEIGHT = Dimensions.get("window").height;
+const initialScale = 1;
+
+export default function ReadBook({ route, navigation }) {
   const { oneBook } = route.params;
   const [currentPage, setCurrentPage] = React.useState(oneBook.pageRead);
   const [pdfLoaded, setPdfLoaded] = React.useState(false);
   const [scale, setScale] = React.useState(initialScale);
+  const [width, setWidth] = React.useState(WIN_WIDTH);
+  const [deviceOrientation, setDeviceOrientation] = React.useState("PORTRAIT");
 
   const isDarkMode = useDarkMode();
   const totalPages = oneBook.pages;
@@ -18,6 +24,19 @@ export default function ReadBook({ route }) {
 
   //reference to pdf document--being able to use setPage() method
   var pdfRef = React.createRef(null);
+
+  //changes  depends of orientation
+  const _onOrientationDidChange = (orientation) => {
+    if (orientation == "LANDSCAPE-LEFT" || orientation == "LANDSCAPE-RIGHT") {
+      setWidth(
+        WIN_HEIGHT > WIN_WIDTH ? WIN_HEIGHT - 0.08 * WIN_HEIGHT : WIN_WIDTH
+      );
+      setDeviceOrientation(orientation);
+    } else {
+      setWidth(WIN_HEIGHT > WIN_WIDTH ? WIN_WIDTH : WIN_HEIGHT);
+      setDeviceOrientation(orientation);
+    }
+  };
 
   const nextPage = () => {
     let nextPage = currentPage + 1 > totalPages ? totalPages : currentPage + 1;
@@ -29,6 +48,28 @@ export default function ReadBook({ route }) {
     setCurrentPage(prevPage);
     pdfRef.setPage(prevPage);
   };
+
+  //add event listener on change orientation and remove it after unmounting
+  React.useEffect(() => {
+    Orientation.addDeviceOrientationListener(_onOrientationDidChange);
+    return () => {
+      Orientation.removeDeviceOrientationListener(_onOrientationDidChange);
+    };
+  }, []);
+
+  //hide stack navigator in landscape while reading
+  React.useLayoutEffect(() => {
+    if (
+      deviceOrientation == "LANDSCAPE-LEFT" ||
+      deviceOrientation == "LANDSCAPE-RIGHT"
+    ) {
+      navigation.setOptions({
+        headerShown: false,
+      });
+    } else {
+      navigation.setOptions({ headerShown: true });
+    }
+  }, [deviceOrientation]);
 
   React.useEffect(() => {
     //useEffect hook when the pdf is loaded-only once
@@ -42,96 +83,109 @@ export default function ReadBook({ route }) {
   }, [currentPage]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: isDarkMode ? "#fff" : "#000000e6",
-        justifyContent: "flex-start",
-      }}
+    <ScrollView
+      horizontal={true}
+      scrollEnabled={false}
+      //scrollEnabled={deviceOrientation.includes("LANDSCAPE") ? false : false}
     >
-      <Caption
-        style={{
-          backgroundColor: "#00000080",
-          color: "white",
-          display: "flex",
-          alignSelf: "center",
-          padding: 3,
-          borderRadius: 5,
-          textAlign: "center",
-          position: "absolute",
-          top: 0,
-          zIndex: 2,
-        }}
-      >
-        {currentPage}/{totalPages}
-      </Caption>
-      <Pdf
-        ref={(pdf) => {
-          pdfRef = pdf;
-        }}
-        horizontal={true}
-        //singlePage={true}
-        scale={initialScale}
-        source={source}
-        fitPolicy={0}
-        enableAnnotationRendering={true}
-        enablePaging={true}
-        onPageSingleTap={(page) => {
-          console.log("single page tapped");
-        }}
-        onPageChanged={(page) => {
-          console.log("page: ", page);
-          setCurrentPage(page);
-        }}
-        onLoadComplete={() => {
-          if (pdfLoaded === false) {
-            setPdfLoaded(true);
-          }
-        }}
-        onPressLink={(uri) => {
-          console.log("Link pressed: ", uri);
-        }}
-        onScaleChanged={(scale1) => {
-          setScale(scale1 >= 1.0 ? scale1 : 1.0);
-        }}
-        onError={(error) => {
-          console.log(error);
-        }}
+      <View
         style={{
           flex: 1,
-          width: Dimensions.get("window").width,
-          height: Dimensions.get("window").height,
-          backgroundColor: isDarkMode ? "#000000e6" : "white",
+          backgroundColor: isDarkMode ? "#000000e6" : "#fff",
+          width: width,
+          height: deviceOrientation.includes("LANDSCAPE") ? WIN_WIDTH : "100%",
+          alignSelf: "center",
+          marginLeft: deviceOrientation.includes("LANDSCAPE")
+            ? -0.16 * WIN_HEIGHT
+            : 0,
+          //justifyContent: "flex-start",
+          //justifyContent: "flex-end",
+          transform:
+            deviceOrientation === "LANDSCAPE-LEFT"
+              ? [{ rotate: "90deg" }]
+              : deviceOrientation === "LANDSCAPE-RIGHT"
+              ? [{ rotate: "-90deg" }]
+              : [{ rotate: "0deg" }],
         }}
-      />
-      {/* <View style={styles.zoom}>
+      >
+        <Caption
+          style={{
+            backgroundColor: "#00000080",
+            color: "white",
+            display: "flex",
+            alignSelf: "center",
+            padding: 3,
+            borderRadius: 5,
+            textAlign: "center",
+            position: "absolute",
+            top: 0,
+            zIndex: 2,
+          }}
+        >
+          {currentPage}/{totalPages}
+        </Caption>
+        <Pdf
+          ref={(pdf) => {
+            pdfRef = pdf;
+          }}
+          maxScale={5}
+          horizontal={true}
+          scale={initialScale}
+          source={source}
+          fitPolicy={deviceOrientation.includes("LANDSCAPE") ? 0 : 0}
+          enableAnnotationRendering={true}
+          enablePaging={true}
+          onPageChanged={(page) => {
+            console.log("page: ", page);
+            setCurrentPage(page);
+          }}
+          onLoadComplete={() => {
+            if (pdfLoaded === false) {
+              setPdfLoaded(true);
+            }
+          }}
+          onScaleChanged={(scale1) => {
+            setScale(scale1 >= 1.0 ? scale1 : 1.0);
+          }}
+          onError={(error) => {
+            console.log(error);
+          }}
+          style={{
+            flex: 1,
+            //width: Dimensions.get("window").width,
+            //height: Dimensions.get("window").height,
+            // backgroundColor: "white", //isDarkMode ? "#000000e6" : "white",
+          }}
+        />
+        {/* <View style={styles.zoom}>
         <IconButton icon="plus" color={"white"} onPress={zoomIn} />
         <IconButton icon="minus" color={"white"} onPress={zoomOut} />
       </View> */}
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          backgroundColor: isDarkMode ? "#000000e6" : "white",
-        }}
-      >
-        <IconButton
-          icon="arrow-left"
-          onPress={prevPage}
-          size={30}
-          style={{ margin: 0 }}
-          color={isDarkMode ? "white" : "#000000e6"}
-        />
-        <IconButton
-          icon="arrow-right"
-          onPress={nextPage}
-          style={{ margin: 0 }}
-          size={30}
-          color={isDarkMode ? "white" : "#000000e6"}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            backgroundColor: isDarkMode ? "#000000e6" : "white",
+          }}
+        >
+          <IconButton
+            icon="arrow-left"
+            onPress={prevPage}
+            size={30}
+            style={{ margin: 0 }}
+            color={isDarkMode ? "white" : "#000000e6"}
+          />
+          <IconButton
+            icon="arrow-right"
+            onPress={nextPage}
+            style={{ margin: 0 }}
+            size={30}
+            color={isDarkMode ? "white" : "#000000e6"}
+          />
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

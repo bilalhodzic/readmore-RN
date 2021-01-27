@@ -28,6 +28,7 @@
     "react-native-cheerio": "^1.0.0-rc.4",
     "react-native-dynamic": "^1.0.0",
     "react-native-gesture-handler": "~1.7.0",
+    "react-native-orientation-locker": "^1.2.0",
     "react-native-paper": "^4.2.0",
     "react-native-pdf": "^6.2.2",
     "react-native-permissions": "^3.0.0",
@@ -38,8 +39,7 @@
     "react-native-unimodules": "~0.11.0",
     "react-native-web": "~0.13.12",
     "react-native-webview": "10.7.0",
-    "rn-fetch-blob": "^0.12.0",
-    "rn-pdf-reader-js": "^4.1.1"
+    "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
@@ -48,6 +48,6 @@
     "react-test-renderer": "~16.13.1"
   },
   "private": true,
-  "name": "readmore-RN",
+  "name": "readmore",
   "version": "1.0.0"
 }

@@ -7,7 +7,7 @@ export const searchWithIndex = async (id) => {
   }
 
   //you can change the url to retrieve whatever you want
-  const Url = `http://gen.lib.rus.ec/json.php?ids=${id}&fields=Author,Title,Pages,Publisher, Year,Extension, Filesize,MD5,Coverurl,descr`;
+  const Url = `http://gen.lib.rus.ec/json.php?ids=${id}&fields=Author,Title,Pages,Publisher, Year,Extension, Filesize,MD5,Coverurl,descr, Language`;
 
   const response = await axios.get(Url);
 

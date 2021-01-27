@@ -223,7 +223,10 @@ export default function MainPage({ navigation }) {
               value={searchQuery}
               style={{ margin: 15, marginBottom: 5 }}
               onIconPress={getBooks}
-              onChangeText={(text) => setSearchQuery(text)}
+              onChangeText={(text) => {
+                setNoResults(false);
+                setSearchQuery(text);
+              }}
             />
 
             <HelperText type="error" visible={searchError}>

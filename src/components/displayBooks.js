@@ -22,11 +22,11 @@ import RNFetchBlob from "rn-fetch-blob";
 export default function DisplayBooks(prop) {
   const [visibleDialog, setVisibleDialog] = React.useState(false);
 
+  //console.log(prop.book);
+
   //making dinamic progress bar
   const normalise = (value) => ((value - 1) * 1) / (prop.book.pages - 1);
   var readProgress = normalise(prop.book.pageRead);
-
-  //console.log("prop is: ", prop);
 
   //if pressed on see more --load one book in another page with all details
   const loadOneBook = (bookid) => {
@@ -96,6 +96,12 @@ export default function DisplayBooks(prop) {
               <MaterialCommunityIcons name="book-open" color="#7fb7f2" />{" "}
               {prop.book.pages} pages
             </Caption>
+            {prop.pathname !== "library" && (
+              <Caption>
+                <MaterialCommunityIcons name="calendar" color="#7fb7f2" />{" "}
+                {prop.book.year}
+              </Caption>
+            )}
           </Card.Content>
           <Divider style={{ marginTop: 10 }} />
           {prop.pathname === "library" && (
