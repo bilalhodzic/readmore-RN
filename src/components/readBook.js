@@ -64,10 +64,23 @@ export default function ReadBook({ route, navigation }) {
       deviceOrientation == "LANDSCAPE-RIGHT"
     ) {
       navigation.setOptions({
-        headerShown: false,
+        headerShown: true,
+        headerTitle: null,
+        headerStyle: { height: 40, backgroundColor: "initial" },
+        headerLeft: null,
       });
     } else {
-      navigation.setOptions({ headerShown: true });
+      navigation.setOptions({
+        headerShown: true,
+        headerTitle: "ReadMore",
+        headerStyle: {
+          height: 80,
+          backgroundColor: "initial",
+          borderBottomWidth: 3,
+          borderRadius: isDarkMode ? 0 : 3,
+          borderBottomColor: isDarkMode ? "#000000cc" : "#7fb7f2CC",
+        },
+      });
     }
   }, [deviceOrientation]);
 
@@ -83,109 +96,111 @@ export default function ReadBook({ route, navigation }) {
   }, [currentPage]);
 
   return (
-    <ScrollView
-      horizontal={true}
-      scrollEnabled={false}
-      //scrollEnabled={deviceOrientation.includes("LANDSCAPE") ? false : false}
+    // <ScrollView
+    //   horizontal={true}
+    //   scrollEnabled={false}
+    //   //scrollEnabled={deviceOrientation.includes("LANDSCAPE") ? false : false}
+    // >
+
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: isDarkMode ? "#000000e6" : "#fff",
+        width: width,
+        position: "absolute",
+        height: deviceOrientation.includes("LANDSCAPE") ? WIN_WIDTH : "100%",
+        alignSelf: "center",
+        // marginLeft: deviceOrientation.includes("LANDSCAPE")
+        //   ? -0.21 * WIN_HEIGHT //-145 //-0.16 * WIN_HEIGHT
+        //   : 0,
+
+        bottom: deviceOrientation.includes("LANDSCAPE") ? "20%" : 0,
+        transform:
+          deviceOrientation === "LANDSCAPE-LEFT"
+            ? [{ rotate: "90deg" }]
+            : deviceOrientation === "LANDSCAPE-RIGHT"
+            ? [{ rotate: "-90deg" }]
+            : [{ rotate: "0deg" }],
+      }}
     >
-      <View
+      <Caption
         style={{
-          flex: 1,
-          backgroundColor: isDarkMode ? "#000000e6" : "#fff",
-          width: width,
-          height: deviceOrientation.includes("LANDSCAPE") ? WIN_WIDTH : "100%",
+          backgroundColor: "#00000080",
+          color: "white",
+          display: "flex",
           alignSelf: "center",
-          marginLeft: deviceOrientation.includes("LANDSCAPE")
-            ? -0.16 * WIN_HEIGHT
-            : 0,
-          //justifyContent: "flex-start",
-          //justifyContent: "flex-end",
-          transform:
-            deviceOrientation === "LANDSCAPE-LEFT"
-              ? [{ rotate: "90deg" }]
-              : deviceOrientation === "LANDSCAPE-RIGHT"
-              ? [{ rotate: "-90deg" }]
-              : [{ rotate: "0deg" }],
+          padding: 3,
+          borderRadius: 5,
+          textAlign: "center",
+          position: "absolute",
+          top: 0,
+          zIndex: 2,
         }}
       >
-        <Caption
-          style={{
-            backgroundColor: "#00000080",
-            color: "white",
-            display: "flex",
-            alignSelf: "center",
-            padding: 3,
-            borderRadius: 5,
-            textAlign: "center",
-            position: "absolute",
-            top: 0,
-            zIndex: 2,
-          }}
-        >
-          {currentPage}/{totalPages}
-        </Caption>
-        <Pdf
-          ref={(pdf) => {
-            pdfRef = pdf;
-          }}
-          maxScale={5}
-          horizontal={true}
-          scale={initialScale}
-          source={source}
-          fitPolicy={deviceOrientation.includes("LANDSCAPE") ? 0 : 0}
-          enableAnnotationRendering={true}
-          enablePaging={true}
-          onPageChanged={(page) => {
-            console.log("page: ", page);
-            setCurrentPage(page);
-          }}
-          onLoadComplete={() => {
-            if (pdfLoaded === false) {
-              setPdfLoaded(true);
-            }
-          }}
-          onScaleChanged={(scale1) => {
-            setScale(scale1 >= 1.0 ? scale1 : 1.0);
-          }}
-          onError={(error) => {
-            console.log(error);
-          }}
-          style={{
-            flex: 1,
-            //width: Dimensions.get("window").width,
-            //height: Dimensions.get("window").height,
-            // backgroundColor: "white", //isDarkMode ? "#000000e6" : "white",
-          }}
-        />
-        {/* <View style={styles.zoom}>
+        {currentPage}/{totalPages}
+      </Caption>
+      <Pdf
+        ref={(pdf) => {
+          pdfRef = pdf;
+        }}
+        maxScale={5}
+        horizontal={true}
+        scale={initialScale}
+        source={source}
+        fitPolicy={deviceOrientation.includes("LANDSCAPE") ? 0 : 0}
+        enableAnnotationRendering={true}
+        enablePaging={true}
+        onPageChanged={(page) => {
+          console.log("page: ", page);
+          setCurrentPage(page);
+        }}
+        onLoadComplete={() => {
+          if (pdfLoaded === false) {
+            setPdfLoaded(true);
+          }
+        }}
+        onScaleChanged={(scale1) => {
+          setScale(scale1 >= 1.0 ? scale1 : 1.0);
+        }}
+        onError={(error) => {
+          console.log(error);
+        }}
+        style={{
+          flex: 1,
+          //width: Dimensions.get("window").width,
+          //height: Dimensions.get("window").height,
+          // backgroundColor: "white", //isDarkMode ? "#000000e6" : "white",
+        }}
+      />
+      {/* <View style={styles.zoom}>
         <IconButton icon="plus" color={"white"} onPress={zoomIn} />
         <IconButton icon="minus" color={"white"} onPress={zoomOut} />
       </View> */}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            backgroundColor: isDarkMode ? "#000000e6" : "white",
-          }}
-        >
-          <IconButton
-            icon="arrow-left"
-            onPress={prevPage}
-            size={30}
-            style={{ margin: 0 }}
-            color={isDarkMode ? "white" : "#000000e6"}
-          />
-          <IconButton
-            icon="arrow-right"
-            onPress={nextPage}
-            style={{ margin: 0 }}
-            size={30}
-            color={isDarkMode ? "white" : "#000000e6"}
-          />
-        </View>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          backgroundColor: isDarkMode ? "#000000e6" : "white",
+        }}
+      >
+        <IconButton
+          icon="arrow-left"
+          onPress={prevPage}
+          size={30}
+          style={{ margin: 0 }}
+          color={isDarkMode ? "white" : "#000000e6"}
+        />
+        <IconButton
+          icon="arrow-right"
+          onPress={nextPage}
+          style={{ margin: 0 }}
+          size={30}
+          color={isDarkMode ? "white" : "#000000e6"}
+        />
       </View>
-    </ScrollView>
+    </View>
+    //</ScrollView>
   );
 }
 

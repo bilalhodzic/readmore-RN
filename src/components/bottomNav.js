@@ -55,6 +55,7 @@ export default function BottomNav() {
       <Tab.Navigator
         initialRouteName="mainPage"
         barStyle={{
+          height: "7.5%",
           backgroundColor: isDarkMode ? "#000000e6" : "#0063cccc",
           borderTopWidth: 1,
           borderTopColor: isDarkMode ? "#00000099" : "lightgray",
