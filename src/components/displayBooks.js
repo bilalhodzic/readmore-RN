@@ -113,7 +113,7 @@ export default function DisplayBooks(prop) {
                   borderRadius: 5,
                   width: "95%",
                 }}
-                color={"royalblue"}
+                color={readProgress === 1 ? "#52af52" : "royalblue"}
                 progress={readProgress}
                 visible={prop.book.pageRead > 1}
               ></ProgressBar>

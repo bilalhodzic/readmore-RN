@@ -19,7 +19,9 @@ export default function ReadBook({ route, navigation }) {
   const [deviceOrientation, setDeviceOrientation] = React.useState("PORTRAIT");
 
   const isDarkMode = useDarkMode();
-  const totalPages = oneBook.pages;
+
+  //when there is undefined number of pages: set them to one
+  const totalPages = oneBook.pages || 1;
   const source = { uri: oneBook.file, cache: true, expiration: 0 };
 
   //reference to pdf document--being able to use setPage() method
@@ -39,7 +41,12 @@ export default function ReadBook({ route, navigation }) {
   };
 
   const nextPage = () => {
-    let nextPage = currentPage + 1 > totalPages ? totalPages : currentPage + 1;
+    let nextPage;
+    if (totalPages === 1) {
+      nextPage = currentPage + 1;
+    } else {
+      nextPage = currentPage + 1 > totalPages ? totalPages : currentPage + 1;
+    }
     setCurrentPage(nextPage);
     pdfRef.setPage(nextPage);
   };
@@ -96,12 +103,6 @@ export default function ReadBook({ route, navigation }) {
   }, [currentPage]);
 
   return (
-    // <ScrollView
-    //   horizontal={true}
-    //   scrollEnabled={false}
-    //   //scrollEnabled={deviceOrientation.includes("LANDSCAPE") ? false : false}
-    // >
-
     <View
       style={{
         flex: 1,
@@ -110,10 +111,6 @@ export default function ReadBook({ route, navigation }) {
         position: "absolute",
         height: deviceOrientation.includes("LANDSCAPE") ? WIN_WIDTH : "100%",
         alignSelf: "center",
-        // marginLeft: deviceOrientation.includes("LANDSCAPE")
-        //   ? -0.21 * WIN_HEIGHT //-145 //-0.16 * WIN_HEIGHT
-        //   : 0,
-
         bottom: deviceOrientation.includes("LANDSCAPE") ? "20%" : 0,
         transform:
           deviceOrientation === "LANDSCAPE-LEFT"
@@ -137,7 +134,7 @@ export default function ReadBook({ route, navigation }) {
           zIndex: 2,
         }}
       >
-        {currentPage}/{totalPages}
+        {totalPages === 1 ? currentPage : currentPage + "/" + totalPages}
       </Caption>
       <Pdf
         ref={(pdf) => {
@@ -200,7 +197,6 @@ export default function ReadBook({ route, navigation }) {
         />
       </View>
     </View>
-    //</ScrollView>
   );
 }
 
